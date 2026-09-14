@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Models / weights (we never commit these)
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.bin
+*.h5
+weights/
+checkpoints/
+models/
+
+# Data
+data/
+*.dicom
+*.dcm
+*.mp4
+*.avi
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
