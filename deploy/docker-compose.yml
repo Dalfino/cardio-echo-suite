@@ -1,0 +1,73 @@
+# cardio-echo-suite — CPU deployment
+# Usage: docker compose -f deploy/docker-compose.yml up
+services:
+  echonet-dynamic:
+    build:
+      context: ../services/echonet-dynamic
+      args:
+        BASE: python:3.10-slim
+    image: cardio-echo-suite/echonet-dynamic:cpu-latest
+    ports:
+      - "8001:8001"
+    environment:
+      ECHONET_DEVICE: cpu
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8001/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  echoprime:
+    build:
+      context: ../services/echoprime
+    image: cardio-echo-suite/echoprime:cpu-latest
+    ports:
+      - "8002:8002"
+    environment:
+      HF_HOME: /root/.cache/huggingface
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8002/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  panecho:
+    build:
+      context: ../services/panecho
+    image: cardio-echo-suite/panecho:cpu-latest
+    ports:
+      - "8003:8003"
+    environment:
+      TORCH_HOME: /root/.cache/torch
+    volumes:
+      - torch-cache:/root/.cache/torch
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8003/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  orchestrator:
+    build:
+      context: ../services/orchestrator
+    image: cardio-echo-suite/orchestrator:latest
+    ports:
+      - "8080:8080"
+    environment:
+      ECHONET_URL: http://echonet-dynamic:8001
+      ECHOPRIME_URL: http://echoprime:8002
+      PANECHO_URL: http://panecho:8003
+    depends_on:
+      - echonet-dynamic
+      - echoprime
+      - panecho
+    restart: unless-stopped
+
+volumes:
+  hf-cache:
+  torch-cache:

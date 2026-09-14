@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - echonet-dynamic
+          - echoprime
+          - panecho
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install ${{ matrix.service }} test deps
+        working-directory: services/${{ matrix.service }}
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          # Make upstream importable for service tests
+          if [ -d upstream ]; then
+            pip install -e upstream/ || true
+          fi
+          pip install pytest
+
+      - name: Run tests
+        working-directory: services/${{ matrix.service }}
+        run: |
+          python -m pytest tests/ -v --tb=short
+        env:
+          # Skip any test that needs network/GPU
+          HF_HUB_OFFLINE: "1"
+          TRANSFORMERS_OFFLINE: "1"
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install ruff
+        run: pip install ruff
+      - name: Lint
+        run: ruff check services/ || true  # non-blocking for now
