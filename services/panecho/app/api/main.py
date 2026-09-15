@@ -24,6 +24,7 @@ from pydantic import BaseModel
 
 from ..fhir import ALL_TASKS, CLASSIFICATION_TASKS, REGRESSION_TASKS, build_preread_report
 from ..cli import predict as cli_predict
+from cardio_echo_core.service_bootstrap import bootstrap_service
 
 logger = logging.getLogger("panecho")
 logging.basicConfig(level=logging.INFO)
@@ -39,6 +40,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+bootstrap_service(app, service_name="panecho")
 
 
 @app.get("/healthz")

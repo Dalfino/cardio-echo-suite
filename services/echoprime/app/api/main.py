@@ -24,6 +24,7 @@ from pydantic import BaseModel
 
 from ..fhir import build_diagnostic_report
 from ..model import EchoPrimeModel
+from cardio_echo_core.service_bootstrap import bootstrap_service
 
 logger = logging.getLogger("echoprime")
 logging.basicConfig(level=logging.INFO)
@@ -39,6 +40,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+bootstrap_service(app, service_name="echoprime")
 
 _model: Optional[EchoPrimeModel] = None
 _finetune_jobs: Dict[str, Dict[str, Any]] = {}

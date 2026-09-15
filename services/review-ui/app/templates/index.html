@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>cardio-echo-suite</h1>
+    <span class="subtitle">AI pre-read review (research only)</span>
+  </header>
+
+  <main>
+    <section class="upload-section">
+      <h2>Upload study</h2>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="echo">Echo</button>
+        <button class="tab-btn" data-tab="ecg">ECG</button>
+      </div>
+
+      <div id="echo-panel" class="tab-panel active">
+        <input type="file" id="echo-file" accept=".mp4,.avi,.dcm,.dicom">
+        <input type="text" id="echo-patient" placeholder="Patient ID" value="DEMO-001">
+        <button onclick="runEcho()">Run echo AI</button>
+      </div>
+
+      <div id="ecg-panel" class="tab-panel" style="display:none;">
+        <input type="file" id="ecg-file" accept=".csv,.xml,.hea,.dcm">
+        <input type="text" id="ecg-patient" placeholder="Patient ID" value="DEMO-001">
+        <button onclick="runEcg()">Run ECG AI</button>
+      </div>
+    </section>
+
+    <section class="result-section" id="result-section" style="display:none;">
+      <h2>AI pre-read</h2>
+      <div class="result-grid">
+        <div class="left-panel">
+          <h3>Summary</h3>
+          <div id="summary"></div>
+
+          <h3>Findings</h3>
+          <div id="findings"></div>
+
+          <h3>Critical findings</h3>
+          <div id="critical"></div>
+
+          <div class="actions">
+            <button class="signoff-btn" onclick="signOff()">Sign off report</button>
+          </div>
+        </div>
+
+        <div class="right-panel">
+          <h3>FHIR bundle <button onclick="toggleFhir()" class="toggle-btn">show/hide</button></h3>
+          <pre id="fhir-bundle" class="fhir-json"></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const ORCH_URL = "{{ orchestrator_url }}";
+
+    // Tab switching
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-panel").forEach(p => p.style.display = "none");
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab + "-panel").style.display = "block";
+      };
+    });
+
+    async function runEcho() {
+      const file = document.getElementById("echo-file").files[0];
+      const patient = document.getElementById("echo-patient").value;
+      if (!file) { alert("Please choose an echo file"); return; }
+
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("patient_id", patient);
+
+      document.getElementById("result-section").style.display = "block";
+      document.getElementById("summary").innerHTML = "<p>Loading...</p>";
+
+      try {
+        const r = await fetch("/api/run/echo", { method: "POST", body: fd });
+        const data = await r.json();
+        renderResult(data);
+      } catch (e) {
+        document.getElementById("summary").innerHTML = `<p class="error">Error: ${e}</p>`;
+      }
+    }
+
+    async function runEcg() {
+      const file = document.getElementById("ecg-file").files[0];
+      const patient = document.getElementById("ecg-patient").value;
+      if (!file) { alert("Please choose an ECG file"); return; }
+
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("patient_id", patient);
+
+      document.getElementById("result-section").style.display = "block";
+      document.getElementById("summary").innerHTML = "<p>Loading...</p>";
+
+      try {
+        const r = await fetch("/api/run/ecg", { method: "POST", body: fd });
+        const data = await r.json();
+        renderResult(data);
+      } catch (e) {
+        document.getElementById("summary").innerHTML = `<p class="error">Error: ${e}</p>`;
+      }
+    }
+
+    function renderResult(data) {
+      // data shape: { patient_id, study_uid, inference_ms, results: { panecho: {...}, neurokit-hrv: {...}, ... } }
+      document.getElementById("summary").innerHTML = `<p><strong>Patient:</strong> ${data.patient_id}</p>
+        <p><strong>Study UID:</strong> ${data.study_uid || "—"}</p>
+        <p><strong>Inference time:</strong> ${data.inference_ms} ms</p>`;
+
+      // Collect findings from all services
+      let findings = [];
+      let critical = [];
+      let fhirBundles = [];
+
+      for (const [svc, result] of Object.entries(data.results || {})) {
+        if (result.error) {
+          findings.push(`<div class="finding error"><strong>${svc}:</strong> error — ${result.error}</div>`);
+          continue;
+        }
+        if (result.summary) {
+          findings.push(`<div class="finding"><strong>${svc}:</strong> ${result.summary}</div>`);
+        }
+        if (result.findings) {
+          for (const f of result.findings) {
+            const text = f.type === "regression"
+              ? `${f.task} = ${f.value} ${f.unit || ""}`
+              : `${f.task} → ${f.predicted_class} (${(f.confidence * 100).toFixed(0)}%)`;
+            findings.push(`<div class="finding">${text}</div>`);
+          }
+        }
+        if (result.critical_findings && result.critical_findings.length > 0) {
+          for (const c of result.critical_findings) {
+            critical.push(`<div class="critical">${c.task}: ${c.reason || "see findings"}</div>`);
+          }
+        }
+        if (result.fhir_bundle) {
+          fhirBundles.push([svc, result.fhir_bundle]);
+        }
+        if (result.fhir) {
+          fhirBundles.push([svc, result.fhir]);
+        }
+      }
+
+      document.getElementById("findings").innerHTML = findings.join("") || "<p>None</p>";
+      document.getElementById("critical").innerHTML = critical.join("") || "<p>None</p>";
+
+      const fhirEl = document.getElementById("fhir-bundle");
+      fhirEl.textContent = JSON.stringify(fhirBundles, null, 2);
+    }
+
+    async function signOff() {
+      if (!confirm("Sign off this report as final?")) return;
+      const r = await fetch("/api/signoff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: "current" }),
+      });
+      const data = await r.json();
+      alert("Signed: " + data.status);
+    }
+
+    function toggleFhir() {
+      const el = document.getElementById("fhir-bundle");
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    }
+  </script>
+</body>
+</html>

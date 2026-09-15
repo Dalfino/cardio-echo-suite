@@ -27,6 +27,7 @@ from pydantic import BaseModel
 from ..ingestion import load_any
 from ..fhir import build_ef_observation, build_segmentation_observation
 from ..model import EchoNetDynamicModel
+from cardio_echo_core.service_bootstrap import bootstrap_service
 
 logger = logging.getLogger("echonet-dynamic")
 logging.basicConfig(level=logging.INFO)
@@ -46,6 +47,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+bootstrap_service(app, service_name="echonet-dynamic")
 
 _model: Optional[EchoNetDynamicModel] = None
 

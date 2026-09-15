@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from ..fhir import build_segmentation_observation
 from ..ingestion import load_image
+from cardio_echo_core.service_bootstrap import bootstrap_service
 
 logger = logging.getLogger("medsam2")
 logging.basicConfig(level=logging.INFO)
@@ -26,6 +27,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
+bootstrap_service(app, service_name="medsam2")
 
 
 class PointPrompt(BaseModel):

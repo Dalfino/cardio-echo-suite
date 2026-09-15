@@ -23,6 +23,7 @@ from pydantic import BaseModel
 
 from ..fhir import build_ecg_diagnostic_report
 from ..ingestion import load_ecg
+from cardio_echo_core.service_bootstrap import bootstrap_service
 
 logger = logging.getLogger("ecg-fm")
 logging.basicConfig(level=logging.INFO)
@@ -41,6 +42,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+bootstrap_service(app, service_name="ecg-fm")
 
 
 def _stub_predictions() -> Dict[str, Any]:
