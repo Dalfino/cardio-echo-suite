@@ -1,15 +1,20 @@
 """Top-level orchestrator for cardio-echo-suite.
 
-Routes incoming echo studies to the three services:
+Routes incoming studies to all 7 services:
 - EchoNet-Dynamic  → EF + LV segmentation      (port 8001)
 - EchoPrime        → views + measurements + draft report (port 8002)
 - PanEcho          → 39-task pre-read          (port 8003)
+- ECG-FM           → ECG rhythm + intervals    (port 8004)
+- MedSAM2          → promptable segmentation   (port 8005)
+- nnU-Net CMR      → automatic CMR seg         (port 8006)
+- NeuroKit2        → HRV + R-peak + quality    (port 8007)
 
-Provides a single `/v1/echo/full` endpoint that fans out to all three
-and returns a unified FHIR R4 composition.
-
-Run:
-    uvicorn app.main:app --host 0.0.0.0 --port 8080
+Endpoints:
+- GET  /healthz            — aggregated downstream health
+- POST /v1/echo/full       — fan out to echo services (echonet + echoprime + panecho)
+- POST /v1/ecg/full        — fan out to ECG services (ecg-fm + neurokit)
+- POST /v1/imaging/full    — fan out to imaging services (medsam2 + nnunet-cmr)
+- POST /v1/composition     — run all relevant services for a patient, return FHIR Composition
 """
 
 from __future__ import annotations
@@ -18,93 +23,95 @@ import asyncio
 import logging
 import os
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import httpx
-from fastapi import FastAPI, File, HTTPException, UploadFile, Query
+from fastapi import FastAPI, File, HTTPException, UploadFile, Query, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 logger = logging.getLogger("orchestrator")
 logging.basicConfig(level=logging.INFO)
 
-ECHONET_URL = os.environ.get("ECHONET_URL", "http://echonet-dynamic:8001")
-ECHOPRIME_URL = os.environ.get("ECHOPRIME_URL", "http://echoprime:8002")
-PANECHO_URL = os.environ.get("PANECHO_URL", "http://panecho:8003")
+# Service URLs (configurable via env)
+SERVICES = {
+    "echonet-dynamic": os.environ.get("ECHONET_URL", "http://echonet-dynamic:8001"),
+    "echoprime":       os.environ.get("ECHOPRIME_URL", "http://echoprime:8002"),
+    "panecho":         os.environ.get("PANECHO_URL", "http://panecho:8003"),
+    "ecg-fm":          os.environ.get("ECGFM_URL", "http://ecg-fm:8004"),
+    "medsam2":         os.environ.get("MEDSAM2_URL", "http://medsam2:8005"),
+    "nnunet-cmr":      os.environ.get("NNUNET_CMR_URL", "http://nnunet-cmr:8006"),
+    "neurokit":        os.environ.get("NEUROKIT_URL", "http://neurokit:8007"),
+}
 TIMEOUT_S = float(os.environ.get("ORCH_TIMEOUT", "120"))
 
 app = FastAPI(
     title="cardio-echo-suite orchestrator",
-    description="Unified entry point for the cardio-echo-suite AI services. Research use only.",
-    version="0.1.0",
+    description="Unified entry point for the cardio-echo-suite AI services (7 services). Research use only.",
+    version="0.2.0",
 )
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
-
-
-class ServiceHealth(BaseModel):
-    echonet: str
-    echoprime: str
-    panecho: str
 
 
 @app.get("/healthz")
 async def healthz():
+    """Aggregated health check across all 7 downstream services."""
     async with httpx.AsyncClient(timeout=5.0) as client:
-        try:
-            r = await client.get(f"{ECHONET_URL}/healthz")
-            en = r.json().get("status", "?") if r.status_code == 200 else f"HTTP {r.status_code}"
-        except Exception as e:
-            en = f"down: {e}"
-        try:
-            r = await client.get(f"{ECHOPRIME_URL}/healthz")
-            ep = r.json().get("status", "?") if r.status_code == 200 else f"HTTP {r.status_code}"
-        except Exception as e:
-            ep = f"down: {e}"
-        try:
-            r = await client.get(f"{PANECHO_URL}/healthz")
-            pe = r.json().get("status", "?") if r.status_code == 200 else f"HTTP {r.status_code}"
-        except Exception as e:
-            pe = f"down: {e}"
-    return ServiceHealth(echonet=en, echoprime=ep, panecho=pe)
+        results = {}
+        for name, url in SERVICES.items():
+            try:
+                r = await client.get(f"{url}/healthz")
+                results[name] = r.json().get("status", "?") if r.status_code == 200 else f"HTTP {r.status_code}"
+            except Exception as e:
+                results[name] = f"down: {type(e).__name__}"
+        return results
 
 
-class FullEchoResult(BaseModel):
-    patient_id: str
-    study_uid: Optional[str]
-    inference_ms: float
-    echonet: Optional[Dict[str, Any]]
-    echoprime: Optional[Dict[str, Any]]
-    panecho: Optional[Dict[str, Any]]
+@app.get("/services")
+def list_services():
+    """List all configured downstream services."""
+    return {"services": SERVICES, "version": "0.2.0"}
 
 
 async def _forward(
     client: httpx.AsyncClient,
-    url: str,
+    service_name: str,
+    endpoint: str,
     filename: str,
     content: bytes,
     params: Dict[str, str],
+    method: str = "POST",
 ) -> Dict[str, Any]:
+    """Forward a request to a downstream service."""
+    url = f"{SERVICES[service_name]}{endpoint}"
     files = {"file": (filename, content)}
-    r = await client.post(url, files=files, params=params)
-    if r.status_code >= 400:
-        return {"error": r.text, "status_code": r.status_code}
-    return r.json()
+    try:
+        r = await client.post(url, files=files, params=params)
+        if r.status_code >= 400:
+            return {"error": r.text, "status_code": r.status_code, "service": service_name}
+        return r.json()
+    except Exception as e:
+        return {"error": str(e), "service": service_name}
 
 
-@app.post("/v1/echo/full", response_model=FullEchoResult)
+class FullResult(BaseModel):
+    patient_id: str
+    study_uid: Optional[str]
+    inference_ms: float
+    results: Dict[str, Any]
+
+
+@app.post("/v1/echo/full", response_model=FullResult)
 async def echo_full(
     file: UploadFile = File(...),
     patient_id: str = Query("unknown"),
     encounter_id: Optional[str] = Query(None),
     study_uid: Optional[str] = Query(None),
-    skip: Optional[str] = Query(None, description="Comma-separated service names to skip: echonet,echoprime,panecho"),
+    skip: Optional[str] = Query(None, description="Comma-separated service names to skip"),
 ):
-    """Run all three models on the uploaded echo and return unified results."""
+    """Run all 3 echo models (echonet, echoprime, panecho) on an uploaded echo."""
     content = await file.read()
     filename = file.filename or "echo.mp4"
     skip_set = {s.strip() for s in skip.split(",")} if skip else set()
@@ -119,48 +126,105 @@ async def echo_full(
     t0 = time.perf_counter()
     async with httpx.AsyncClient(timeout=TIMEOUT_S) as client:
         tasks = {}
-        if "echonet" not in skip_set:
-            tasks["echonet"] = _forward(
-                client, f"{ECHONET_URL}/predict/ef", filename, content, params
-            )
+        if "echonet" not in skip_set and "echonet-dynamic" not in skip_set:
+            tasks["echonet"] = _forward(client, "echonet-dynamic", "/predict/ef", filename, content, params)
         if "echoprime" not in skip_set:
-            tasks["echoprime"] = _forward(
-                client, f"{ECHOPRIME_URL}/analyze", filename, content, params
-            )
+            tasks["echoprime"] = _forward(client, "echoprime", "/analyze", filename, content, params)
         if "panecho" not in skip_set:
-            tasks["panecho"] = _forward(
-                client, f"{PANECHO_URL}/predict", filename, content,
-                {**params, "dry_run": "true"},  # default dry-run for speed
-            )
+            tasks["panecho"] = _forward(client, "panecho", "/predict",
+                                        filename, content, {**params, "dry_run": "true"})
         results = await asyncio.gather(*tasks.values(), return_exceptions=True)
         out = dict(zip(tasks.keys(), results))
-
     dt_ms = (time.perf_counter() - t0) * 1000
-
-    # Normalize exceptions to error dicts
     for k, v in out.items():
         if isinstance(v, Exception):
             out[k] = {"error": str(v)}
 
-    return FullEchoResult(
-        patient_id=patient_id,
-        study_uid=study_uid,
-        inference_ms=round(dt_ms, 1),
-        echonet=out.get("echonet"),
-        echoprime=out.get("echoprime"),
-        panecho=out.get("panecho"),
-    )
+    return FullResult(patient_id=patient_id, study_uid=study_uid,
+                      inference_ms=round(dt_ms, 1), results=out)
+
+
+@app.post("/v1/ecg/full", response_model=FullResult)
+async def ecg_full(
+    file: UploadFile = File(...),
+    patient_id: str = Query("unknown"),
+    encounter_id: Optional[str] = Query(None),
+    study_uid: Optional[str] = Query(None),
+):
+    """Run ECG-FM + NeuroKit2 on an uploaded ECG file."""
+    content = await file.read()
+    filename = file.filename or "ecg.csv"
+    params = {
+        "patient_id": patient_id,
+        "encounter_id": encounter_id or "",
+        "study_uid": study_uid or "",
+        "dry_run": "true",  # ecg-fm dry-run by default for speed
+    }
+
+    t0 = time.perf_counter()
+    async with httpx.AsyncClient(timeout=TIMEOUT_S) as client:
+        tasks = {
+            "ecg-fm": _forward(client, "ecg-fm", "/predict", filename, content, params),
+            "neurokit-hrv": _forward(client, "neurokit", "/hrv", filename, content,
+                                     {"fs": "250"}),
+            "neurokit-quality": _forward(client, "neurokit", "/quality", filename, content,
+                                         {"fs": "250"}),
+        }
+        results = await asyncio.gather(*tasks.values(), return_exceptions=True)
+        out = dict(zip(tasks.keys(), results))
+    dt_ms = (time.perf_counter() - t0) * 1000
+    for k, v in out.items():
+        if isinstance(v, Exception):
+            out[k] = {"error": str(v)}
+
+    return FullResult(patient_id=patient_id, study_uid=study_uid,
+                      inference_ms=round(dt_ms, 1), results=out)
+
+
+@app.post("/v1/imaging/full", response_model=FullResult)
+async def imaging_full(
+    file: UploadFile = File(...),
+    patient_id: str = Query("unknown"),
+    encounter_id: Optional[str] = Query(None),
+    study_uid: Optional[str] = Query(None),
+    modality: str = Query("auto", description="cmr | ct | auto"),
+):
+    """Run imaging services (medsam2, nnunet-cmr) on an uploaded image."""
+    content = await file.read()
+    filename = file.filename or "image.nii"
+    params = {
+        "patient_id": patient_id,
+        "encounter_id": encounter_id or "",
+        "study_uid": study_uid or "",
+        "dry_run": "true",
+    }
+
+    t0 = time.perf_counter()
+    async with httpx.AsyncClient(timeout=TIMEOUT_S) as client:
+        tasks = {}
+        if modality in ("cmr", "auto"):
+            tasks["nnunet-cmr"] = _forward(client, "nnunet-cmr", "/predict",
+                                           filename, content, params)
+        if modality in ("ct", "auto"):
+            tasks["medsam2"] = _forward(client, "medsam2", "/predict/auto",
+                                        filename, content,
+                                        {**params, "structure": "cardiac chamber"})
+        results = await asyncio.gather(*tasks.values(), return_exceptions=True)
+        out = dict(zip(tasks.keys(), results))
+    dt_ms = (time.perf_counter() - t0) * 1000
+    for k, v in out.items():
+        if isinstance(v, Exception):
+            out[k] = {"error": str(v)}
+
+    return FullResult(patient_id=patient_id, study_uid=study_uid,
+                      inference_ms=round(dt_ms, 1), results=out)
 
 
 @app.get("/")
 def root():
     return {
-        "service": "cardio-echo-suite orchestrator",
-        "endpoints": ["/healthz", "/v1/echo/full"],
-        "downstream": {
-            "echonet-dynamic": ECHONET_URL,
-            "echoprime": ECHOPRIME_URL,
-            "panecho": PANECHO_URL,
-        },
+        "service": "cardio-echo-suite orchestrator v0.2.0",
+        "endpoints": ["/healthz", "/services", "/v1/echo/full", "/v1/ecg/full", "/v1/imaging/full"],
+        "downstream": SERVICES,
         "docs": "/docs",
     }

@@ -1,16 +1,18 @@
-# cardio-echo-suite — CPU deployment
-# Usage: docker compose -f deploy/docker-compose.yml up
+# cardio-echo-suite — CPU deployment (7 services + orchestrator)
+# Build from repo root: docker compose -f deploy/docker-compose.yml up
 services:
   echonet-dynamic:
     build:
-      context: ../services/echonet-dynamic
-      args:
-        BASE: python:3.10-slim
+      context: ..
+      dockerfile: services/echonet-dynamic/Dockerfile
     image: cardio-echo-suite/echonet-dynamic:cpu-latest
-    ports:
-      - "8001:8001"
+    ports: ["8001:8001"]
     environment:
       ECHONET_DEVICE: cpu
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      AUDIT_LOG_DIR: /var/log/cardio
+    volumes:
+      - audit-logs:/var/log/cardio
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8001/healthz')"]
@@ -20,14 +22,17 @@ services:
 
   echoprime:
     build:
-      context: ../services/echoprime
+      context: ..
+      dockerfile: services/echoprime/Dockerfile
     image: cardio-echo-suite/echoprime:cpu-latest
-    ports:
-      - "8002:8002"
+    ports: ["8002:8002"]
     environment:
       HF_HOME: /root/.cache/huggingface
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      AUDIT_LOG_DIR: /var/log/cardio
     volumes:
       - hf-cache:/root/.cache/huggingface
+      - audit-logs:/var/log/cardio
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8002/healthz')"]
@@ -37,14 +42,17 @@ services:
 
   panecho:
     build:
-      context: ../services/panecho
+      context: ..
+      dockerfile: services/panecho/Dockerfile
     image: cardio-echo-suite/panecho:cpu-latest
-    ports:
-      - "8003:8003"
+    ports: ["8003:8003"]
     environment:
       TORCH_HOME: /root/.cache/torch
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      AUDIT_LOG_DIR: /var/log/cardio
     volumes:
       - torch-cache:/root/.cache/torch
+      - audit-logs:/var/log/cardio
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8003/healthz')"]
@@ -52,22 +60,107 @@ services:
       timeout: 5s
       retries: 3
 
+  ecg-fm:
+    build:
+      context: ..
+      dockerfile: services/ecg-fm/Dockerfile
+    image: cardio-echo-suite/ecg-fm:cpu-latest
+    ports: ["8004:8004"]
+    environment:
+      HF_HOME: /root/.cache/huggingface
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      AUDIT_LOG_DIR: /var/log/cardio
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+      - audit-logs:/var/log/cardio
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8004/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  medsam2:
+    build:
+      context: ..
+      dockerfile: services/medsam2/Dockerfile
+    image: cardio-echo-suite/medsam2:cpu-latest
+    ports: ["8005:8005"]
+    environment:
+      HF_HOME: /root/.cache/huggingface
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      AUDIT_LOG_DIR: /var/log/cardio
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+      - audit-logs:/var/log/cardio
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8005/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  nnunet-cmr:
+    build:
+      context: ..
+      dockerfile: services/nnunet-cmr/Dockerfile
+    image: cardio-echo-suite/nnunet-cmr:cpu-latest
+    ports: ["8006:8006"]
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      AUDIT_LOG_DIR: /var/log/cardio
+    volumes:
+      - audit-logs:/var/log/cardio
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8006/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  neurokit:
+    build:
+      context: ..
+      dockerfile: services/neurokit/Dockerfile
+    image: cardio-echo-suite/neurokit:latest
+    ports: ["8007:8007"]
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      AUDIT_LOG_DIR: /var/log/cardio
+    volumes:
+      - audit-logs:/var/log/cardio
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8007/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   orchestrator:
     build:
-      context: ../services/orchestrator
+      context: ..
+      dockerfile: services/orchestrator/Dockerfile
     image: cardio-echo-suite/orchestrator:latest
-    ports:
-      - "8080:8080"
+    ports: ["8080:8080"]
     environment:
       ECHONET_URL: http://echonet-dynamic:8001
       ECHOPRIME_URL: http://echoprime:8002
       PANECHO_URL: http://panecho:8003
+      ECGFM_URL: http://ecg-fm:8004
+      MEDSAM2_URL: http://medsam2:8005
+      NNUNET_CMR_URL: http://nnunet-cmr:8006
+      NEUROKIT_URL: http://neurokit:8007
     depends_on:
       - echonet-dynamic
       - echoprime
       - panecho
+      - ecg-fm
+      - medsam2
+      - nnunet-cmr
+      - neurokit
     restart: unless-stopped
 
 volumes:
   hf-cache:
   torch-cache:
+  audit-logs:

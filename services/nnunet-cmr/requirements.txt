@@ -1,0 +1,15 @@
+cardio-echo-core @ file://../../packages/cardio-echo-core
+torch>=1.13
+torchvision>=0.14
+numpy>=1.22
+opencv-python-headless>=4.7
+pydicom>=2.3
+nibabel>=5.0
+nnunetv2>=2.2
+fastapi>=0.100
+uvicorn[standard]>=0.22
+python-multipart>=0.0.6
+pydantic>=2.0
+onnx>=1.14
+onnxruntime>=1.18
+tqdm>=4.65

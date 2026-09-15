@@ -1,3 +1,4 @@
+cardio-echo-core @ file://../../packages/cardio-echo-core
 torch>=1.13
 torchvision>=0.14
 numpy>=1.22

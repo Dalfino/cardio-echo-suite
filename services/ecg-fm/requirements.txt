@@ -1,0 +1,14 @@
+cardio-echo-core @ file://../../packages/cardio-echo-core
+torch>=1.13
+torchvision>=0.14
+transformers>=4.35
+peft>=0.7
+huggingface_hub>=0.17
+numpy>=1.22
+wfdb>=4.1
+pydicom>=2.3
+fastapi>=0.100
+uvicorn[standard]>=0.22
+python-multipart>=0.0.6
+pydantic>=2.0
+tqdm>=4.65

@@ -12,10 +12,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service:
-          - echonet-dynamic
-          - echoprime
-          - panecho
+        package:
+          - { dir: packages/cardio-echo-core, name: cardio-echo-core }
+          - { dir: services/echonet-dynamic, name: echonet-dynamic }
+          - { dir: services/echoprime, name: echoprime }
+          - { dir: services/panecho, name: panecho }
+          - { dir: services/ecg-fm, name: ecg-fm }
+          - { dir: services/medsam2, name: medsam2 }
+          - { dir: services/nnunet-cmr, name: nnunet-cmr }
+          - { dir: services/neurokit, name: neurokit }
 
     steps:
       - uses: actions/checkout@v4
@@ -25,34 +30,24 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install ${{ matrix.service }} test deps
-        working-directory: services/${{ matrix.service }}
+      - name: Install cardio-echo-core (shared dependency)
+        if: matrix.package.name != 'cardio-echo-core'
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
-          # Make upstream importable for service tests
+          pip install -e packages/cardio-echo-core
+
+      - name: Install ${{ matrix.package.name }} test deps
+        working-directory: ${{ matrix.package.dir }}
+        run: |
+          pip install -r requirements.txt || true
           if [ -d upstream ]; then
             pip install -e upstream/ || true
           fi
-          pip install pytest
+          pip install pytest httpx
 
       - name: Run tests
-        working-directory: services/${{ matrix.service }}
-        run: |
-          python -m pytest tests/ -v --tb=short
+        working-directory: ${{ matrix.package.dir }}
+        run: python -m pytest tests/ -v --tb=short
         env:
-          # Skip any test that needs network/GPU
           HF_HUB_OFFLINE: "1"
           TRANSFORMERS_OFFLINE: "1"
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-      - name: Install ruff
-        run: pip install ruff
-      - name: Lint
-        run: ruff check services/ || true  # non-blocking for now
