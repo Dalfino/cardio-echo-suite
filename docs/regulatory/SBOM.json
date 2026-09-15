@@ -1,0 +1,1109 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "spdx-005e691f-5cba-4fea-9100-d57a182ff1ed",
+  "name": "cardio-echo-suite SBOM",
+  "documentNamespace": "https://github.com/Dalfino/cardio-echo-suite/sbom/005e691f-5cba-4fea-9100-d57a182ff1ed",
+  "creationInfo": {
+    "created": "2026-09-15T17:45:28.810325+00:00",
+    "creators": [
+      "Tool: cardio-echo-suite SBOM generator (scripts/generate_sbom.py)",
+      "Organization: cardio-echo-suite"
+    ],
+    "licenseListVersion": "3.20"
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-cardio-echo-suite",
+      "name": "cardio-echo-suite",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "https://github.com/Dalfino/cardio-echo-suite",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-dicom-gateway",
+      "name": "dicom-gateway",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-cardio-echo-core",
+      "name": "cardio-echo-core",
+      "versionInfo": "dev",
+      "downloadLocation": "https://pypi.org/project/cardio-echo-core/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pynetdicom",
+      "name": "pynetdicom",
+      "versionInfo": "2.0",
+      "downloadLocation": "https://pypi.org/project/pynetdicom/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pydicom",
+      "name": "pydicom",
+      "versionInfo": "2.3",
+      "downloadLocation": "https://pypi.org/project/pydicom/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-httpx",
+      "name": "httpx",
+      "versionInfo": "0.24",
+      "downloadLocation": "https://pypi.org/project/httpx/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-fastapi",
+      "name": "fastapi",
+      "versionInfo": "0.100",
+      "downloadLocation": "https://pypi.org/project/fastapi/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-uvicorn",
+      "name": "uvicorn",
+      "versionInfo": "0.22",
+      "downloadLocation": "https://pypi.org/project/uvicorn/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pydantic",
+      "name": "pydantic",
+      "versionInfo": "2.0",
+      "downloadLocation": "https://pypi.org/project/pydantic/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-docker-python-3.10-slim",
+      "name": "docker:python:3.10-slim",
+      "versionInfo": "3.10-slim",
+      "downloadLocation": "https://hub.docker.com/_/python",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ecg-fm",
+      "name": "ecg-fm",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-torch",
+      "name": "torch",
+      "versionInfo": "1.13",
+      "downloadLocation": "https://pypi.org/project/torch/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-torchvision",
+      "name": "torchvision",
+      "versionInfo": "0.14",
+      "downloadLocation": "https://pypi.org/project/torchvision/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-transformers",
+      "name": "transformers",
+      "versionInfo": "4.35",
+      "downloadLocation": "https://pypi.org/project/transformers/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-peft",
+      "name": "peft",
+      "versionInfo": "0.7",
+      "downloadLocation": "https://pypi.org/project/peft/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-huggingface-hub",
+      "name": "huggingface_hub",
+      "versionInfo": "0.17",
+      "downloadLocation": "https://pypi.org/project/huggingface_hub/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-numpy",
+      "name": "numpy",
+      "versionInfo": "1.22",
+      "downloadLocation": "https://pypi.org/project/numpy/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-wfdb",
+      "name": "wfdb",
+      "versionInfo": "4.1",
+      "downloadLocation": "https://pypi.org/project/wfdb/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-python-multipart",
+      "name": "python-multipart",
+      "versionInfo": "0.0.6",
+      "downloadLocation": "https://pypi.org/project/python-multipart/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-tqdm",
+      "name": "tqdm",
+      "versionInfo": "4.65",
+      "downloadLocation": "https://pypi.org/project/tqdm/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-docker-${base}",
+      "name": "docker:${BASE}",
+      "versionInfo": "latest",
+      "downloadLocation": "https://hub.docker.com/_/${BASE}",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-echonet-dynamic",
+      "name": "echonet-dynamic",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-opencv-python-headless",
+      "name": "opencv-python-headless",
+      "versionInfo": "4.7",
+      "downloadLocation": "https://pypi.org/project/opencv-python-headless/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-scikit-image",
+      "name": "scikit-image",
+      "versionInfo": "0.19",
+      "downloadLocation": "https://pypi.org/project/scikit-image/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-scikit-learn",
+      "name": "scikit-learn",
+      "versionInfo": "1.1",
+      "downloadLocation": "https://pypi.org/project/scikit-learn/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pandas",
+      "name": "pandas",
+      "versionInfo": "1.5",
+      "downloadLocation": "https://pypi.org/project/pandas/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-matplotlib",
+      "name": "matplotlib",
+      "versionInfo": "3.6",
+      "downloadLocation": "https://pypi.org/project/matplotlib/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-pyyaml",
+      "name": "pyyaml",
+      "versionInfo": "6.0",
+      "downloadLocation": "https://pypi.org/project/pyyaml/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-echoprime",
+      "name": "echoprime",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-accelerate",
+      "name": "accelerate",
+      "versionInfo": "0.23",
+      "downloadLocation": "https://pypi.org/project/accelerate/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-medsam2",
+      "name": "medsam2",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-nibabel",
+      "name": "nibabel",
+      "versionInfo": "5.0",
+      "downloadLocation": "https://pypi.org/project/nibabel/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-onnx",
+      "name": "onnx",
+      "versionInfo": "1.14",
+      "downloadLocation": "https://pypi.org/project/onnx/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-onnxruntime",
+      "name": "onnxruntime",
+      "versionInfo": "1.18",
+      "downloadLocation": "https://pypi.org/project/onnxruntime/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-neurokit",
+      "name": "neurokit",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-scipy",
+      "name": "scipy",
+      "versionInfo": "1.10",
+      "downloadLocation": "https://pypi.org/project/scipy/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-neurokit2",
+      "name": "neurokit2",
+      "versionInfo": "0.2.50",
+      "downloadLocation": "https://pypi.org/project/neurokit2/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-nnunet-cmr",
+      "name": "nnunet-cmr",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-nnunetv2",
+      "name": "nnunetv2",
+      "versionInfo": "2.2",
+      "downloadLocation": "https://pypi.org/project/nnunetv2/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-orchestrator",
+      "name": "orchestrator",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-panecho",
+      "name": "panecho",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-review-ui",
+      "name": "review-ui",
+      "versionInfo": "0.5.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 cardio-echo-suite authors"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-jinja2",
+      "name": "jinja2",
+      "versionInfo": "3.1",
+      "downloadLocation": "https://pypi.org/project/jinja2/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-dicom-gateway"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dicom-gateway",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cardio-echo-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dicom-gateway",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pynetdicom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dicom-gateway",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydicom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dicom-gateway",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-httpx"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dicom-gateway",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dicom-gateway",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dicom-gateway",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-dicom-gateway",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-python-3.10-slim"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-ecg-fm"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cardio-echo-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torch"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torchvision"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-transformers"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-peft"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-huggingface-hub"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-numpy"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-wfdb"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydicom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python-multipart"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tqdm"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ecg-fm",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-${base}"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-echonet-dynamic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cardio-echo-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torch"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torchvision"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-numpy"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-opencv-python-headless"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydicom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python-multipart"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tqdm"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-scikit-image"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-scikit-learn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pandas"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-matplotlib"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pyyaml"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echonet-dynamic",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-${base}"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-echoprime"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cardio-echo-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torch"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torchvision"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-transformers"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-peft"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-accelerate"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-huggingface-hub"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-numpy"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-opencv-python-headless"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python-multipart"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tqdm"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-echoprime",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-${base}"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-medsam2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cardio-echo-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torch"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torchvision"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-transformers"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-huggingface-hub"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-numpy"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-opencv-python-headless"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydicom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-nibabel"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python-multipart"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-onnx"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-onnxruntime"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tqdm"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-medsam2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-${base}"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-neurokit"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-neurokit",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cardio-echo-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-neurokit",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-numpy"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-neurokit",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-scipy"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-neurokit",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-neurokit2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-neurokit",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-neurokit",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-neurokit",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python-multipart"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-neurokit",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-neurokit",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-python-3.10-slim"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-nnunet-cmr"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cardio-echo-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torch"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torchvision"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-numpy"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-opencv-python-headless"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydicom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-nibabel"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-nnunetv2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python-multipart"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-onnx"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-onnxruntime"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tqdm"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-nnunet-cmr",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-${base}"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-orchestrator"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-orchestrator",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-orchestrator",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-orchestrator",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-httpx"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-orchestrator",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python-multipart"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-orchestrator",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-orchestrator",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-python-3.10-slim"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-panecho"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cardio-echo-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torch"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-torchvision"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-numpy"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-opencv-python-headless"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python-multipart"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tqdm"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-panecho",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-${base}"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-cardio-echo-suite",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-review-ui"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-review-ui",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cardio-echo-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-review-ui",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-review-ui",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-review-ui",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-jinja2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-review-ui",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-python-multipart"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-review-ui",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-httpx"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-review-ui",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-review-ui",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-docker-python-3.10-slim"
+    }
+  ]
+}
