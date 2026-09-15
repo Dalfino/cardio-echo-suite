@@ -61,6 +61,15 @@ def healthz():
     return {"status": "ok"}
 
 
+@app.get("/demo", response_class=HTMLResponse)
+async def demo(request: Request):
+    """Live demo UI with mock data — for UI/UX evaluation without backend."""
+    demo_path = STATIC_DIR / "demo" / "index.html"
+    if demo_path.exists():
+        return HTMLResponse(demo_path.read_text())
+    raise HTTPException(404, "Demo not found")
+
+
 @app.post("/api/run/echo")
 async def run_echo(file: UploadFile = File(...), patient_id: str = Form("unknown")):
     content = await file.read()

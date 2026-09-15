@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cardio-echo-suite — Live Demo (Mock Data)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    background: #f5f7fa;
+    color: #1a202c;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Top navigation */
+  header.app-header {
+    background: linear-gradient(90deg, #1a3a5c 0%, #2c5282 100%);
+    color: white;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  header .brand { display: flex; align-items: center; gap: 12px; }
+  header .logo {
+    width: 32px; height: 32px;
+    background: #fff;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #1a3a5c; font-weight: 700; font-size: 16px;
+  }
+  header .title { font-size: 16px; font-weight: 600; }
+  header .subtitle { font-size: 12px; opacity: 0.8; }
+  header .user-info { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  header .user-avatar {
+    width: 28px; height: 28px;
+    background: #4fd1c5; color: #1a3a5c;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 12px;
+  }
+
+  /* Main layout */
+  main.app-main {
+    display: grid;
+    grid-template-columns: 280px 1fr 360px;
+    gap: 16px;
+    padding: 16px 24px;
+    height: calc(100vh - 64px);
+  }
+
+  /* Worklist (left panel) */
+  aside.worklist {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .worklist-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .worklist-header h2 { font-size: 14px; color: #1a3a5c; }
+  .worklist-count {
+    background: #edf2f7; color: #4a5568;
+    padding: 2px 8px; border-radius: 10px; font-size: 11px;
+  }
+  .worklist-filter {
+    padding: 8px 16px; border-bottom: 1px solid #e2e8f0;
+  }
+  .worklist-filter select {
+    width: 100%; padding: 6px 8px; border: 1px solid #cbd5e0;
+    border-radius: 4px; font-size: 12px;
+  }
+  .worklist-items { flex: 1; overflow-y: auto; }
+  .worklist-item {
+    padding: 12px 16px; border-bottom: 1px solid #edf2f7;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .worklist-item:hover { background: #f7fafc; }
+  .worklist-item.active { background: #ebf8ff; border-left: 3px solid #3182ce; padding-left: 13px; }
+  .worklist-item .study-info { display: flex; justify-content: space-between; align-items: flex-start; }
+  .worklist-item .patient-id { font-weight: 600; font-size: 13px; }
+  .worklist-item .study-type { font-size: 11px; color: #718096; margin-top: 2px; }
+  .worklist-item .study-time { font-size: 11px; color: #a0aec0; }
+  .worklist-item .critical-flag {
+    display: inline-block; background: #fed7d7; color: #c53030;
+    padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600;
+    margin-top: 4px;
+  }
+  .worklist-item .ai-flag {
+    display: inline-block; background: #bee3f8; color: #2c5282;
+    padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600;
+    margin-top: 4px; margin-left: 4px;
+  }
+
+  /* Center panel — study viewer */
+  section.viewer {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .viewer-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .viewer-header .study-title { font-size: 16px; font-weight: 600; color: #1a3a5c; }
+  .viewer-header .study-meta { font-size: 12px; color: #718096; margin-top: 2px; }
+  .viewer-header .actions { display: flex; gap: 8px; }
+  .btn { padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; }
+  .btn-primary { background: #3182ce; color: white; }
+  .btn-primary:hover { background: #2c5282; }
+  .btn-success { background: #38a169; color: white; }
+  .btn-success:hover { background: #2f855a; }
+  .btn-secondary { background: #edf2f7; color: #4a5568; }
+  .btn-secondary:hover { background: #e2e8f0; }
+
+  .viewer-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+    overflow: auto;
+  }
+
+  .viewer-section {
+    background: #f7fafc;
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+  }
+  .viewer-section h3 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: #4a5568; margin-bottom: 8px;
+  }
+
+  /* Synthetic echo video */
+  .echo-player {
+    background: #000;
+    border-radius: 4px;
+    aspect-ratio: 4/3;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .echo-player canvas { width: 100%; height: 100%; }
+  .echo-player .play-overlay {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(0,0,0,0.6); color: white;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 24px;
+  }
+  .echo-controls {
+    margin-top: 8px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px;
+  }
+  .echo-controls input[type=range] { flex: 1; }
+
+  /* ECG trace */
+  .ecg-trace {
+    background: #1a202c;
+    border-radius: 4px;
+    aspect-ratio: 4/1;
+    position: relative;
+    overflow: hidden;
+  }
+  .ecg-trace canvas { width: 100%; height: 100%; }
+
+  /* Right panel — AI pre-read */
+  aside.ai-read {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    overflow-y: auto;
+  }
+  .ai-read-header {
+    padding: 12px 16px;
+    background: linear-gradient(90deg, #2c5282 0%, #3182ce 100%);
+    color: white;
+  }
+  .ai-read-header h2 { font-size: 14px; }
+  .ai-read-header .ai-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; margin-top: 4px; display: inline-block;
+  }
+  .ai-summary {
+    padding: 12px 16px;
+    background: #fef5e7;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .ai-summary .summary-text { font-size: 13px; color: #744210; }
+  .ai-summary .critical {
+    background: #fed7d7; color: #c53030;
+    padding: 6px 10px; border-radius: 4px;
+    margin-top: 8px; font-size: 12px; font-weight: 600;
+  }
+
+  .ai-section { padding: 12px 16px; border-bottom: 1px solid #edf2f7; }
+  .ai-section h3 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: #4a5568; margin-bottom: 8px;
+  }
+
+  .finding {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; border-bottom: 1px solid #edf2f7;
+    font-size: 13px;
+  }
+  .finding:last-child { border-bottom: none; }
+  .finding .finding-name { color: #2d3748; }
+  .finding .finding-value { font-weight: 600; }
+  .finding .confidence-bar {
+    width: 60px; height: 4px; background: #e2e8f0; border-radius: 2px;
+    overflow: hidden; margin-left: 8px;
+  }
+  .finding .confidence-fill {
+    height: 100%; background: #38a169;
+    transition: width 0.3s;
+  }
+  .finding .confidence-fill.low { background: #dd6b20; }
+  .finding .confidence-fill.indeterminate { background: #c53030; }
+
+  .fhir-viewer {
+    background: #1a202c;
+    color: #68d391;
+    padding: 12px;
+    border-radius: 4px;
+    font-family: "SF Mono", "Monaco", "Consolas", monospace;
+    font-size: 11px;
+    max-height: 200px;
+    overflow: auto;
+    white-space: pre-wrap;
+  }
+
+  /* Sign-off modal */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  .modal {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  .modal h2 { color: #1a3a5c; margin-bottom: 12px; }
+  .modal p { margin-bottom: 16px; color: #4a5568; }
+  .modal .form-field { margin-bottom: 12px; }
+  .modal label { display: block; font-size: 12px; color: #718096; margin-bottom: 4px; }
+  .modal input, .modal select {
+    width: 100%; padding: 8px; border: 1px solid #cbd5e0;
+    border-radius: 4px; font-size: 14px;
+  }
+  .modal .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+  /* Status badges */
+  .status-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+  }
+  .status-preliminary { background: #fefcbf; color: #744210; }
+  .status-final { background: #c6f6d5; color: #22543d; }
+  .status-signed { background: #bee3f8; color: #2c5282; }
+
+  /* No study selected state */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; color: #a0aec0;
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+  .demo-banner {
+    background: #fed7d7; color: #c53030;
+    padding: 8px 24px;
+    font-size: 12px; text-align: center;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-banner">
+  DEMO MODE — Using mock data. No real patient information. AI predictions are simulated for UI/UX evaluation.
+</div>
+
+<header class="app-header">
+  <div class="brand">
+    <div class="logo">♥</div>
+    <div>
+      <div class="title">cardio-echo-suite</div>
+      <div class="subtitle">AI pre-read review · v0.5.0</div>
+    </div>
+  </div>
+  <div class="user-info">
+    <span>Dr. Sarah Chen, MD</span>
+    <div class="user-avatar">SC</div>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <!-- LEFT: Worklist -->
+  <aside class="worklist">
+    <div class="worklist-header">
+      <h2>Pending reviews</h2>
+      <span class="worklist-count" id="worklist-count">5</span>
+    </div>
+    <div class="worklist-filter">
+      <select id="filter-modality" onchange="filterWorklist()">
+        <option value="all">All modalities</option>
+        <option value="echo">Echocardiogram</option>
+        <option value="ecg">ECG</option>
+      </select>
+    </div>
+    <div class="worklist-items" id="worklist-items"></div>
+  </aside>
+
+  <!-- CENTER: Viewer -->
+  <section class="viewer" id="viewer">
+    <!-- Populated by JS -->
+  </section>
+
+  <!-- RIGHT: AI pre-read -->
+  <aside class="ai-read" id="ai-read">
+    <!-- Populated by JS -->
+  </aside>
+
+</main>
+
+<!-- Sign-off modal -->
+<div class="modal-overlay" id="signoff-modal" style="display:none;">
+  <div class="modal">
+    <h2>Sign off report</h2>
+    <p>You are about to finalize this AI pre-read as the official interpretation. The report status will change from <strong>preliminary</strong> to <strong>final</strong>.</p>
+    <div class="form-field">
+      <label>Reviewing physician</label>
+      <input type="text" value="Dr. Sarah Chen, MD" id="signoff-name">
+    </div>
+    <div class="form-field">
+      <label>Clinical comment (optional)</label>
+      <input type="text" placeholder="e.g. Agree with AI assessment" id="signoff-comment">
+    </div>
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="closeSignoff()">Cancel</button>
+      <button class="btn btn-success" onclick="confirmSignoff()">Sign off as final</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// MOCK DATA — realistic but synthetic
+// ============================================================
+
+const STUDIES = [
+  {
+    id: "study-001",
+    patient_id: "PT-2026-0042",
+    patient_age: 67,
+    patient_sex: "M",
+    modality: "echo",
+    study_type: "TTE — Apical 4-chamber",
+    study_time: "2026-09-16 08:14",
+    status: "preliminary",
+    critical: true,
+    ai_summary: "EF = 28% (severely reduced). Anterior wall motion abnormality. Moderate mitral regurgitation.",
+    findings: [
+      { name: "Ejection fraction", value: "28%", type: "regression", confidence: 0.92, unit: "%" },
+      { name: "LV systolic function", value: "severely_reduced", type: "classification", confidence: 0.94 },
+      { name: "Anterior wall motion", value: "hypokinetic", type: "classification", confidence: 0.88 },
+      { name: "Mitral regurgitation", value: "moderate", type: "classification", confidence: 0.82 },
+      { name: "Aortic stenosis", value: "none", type: "classification", confidence: 0.96 },
+      { name: "Pericardial effusion", value: "none", type: "classification", confidence: 0.98 },
+      { name: "Tamponade physiology", value: "no", type: "classification", confidence: 0.99 },
+    ],
+    critical_findings: [
+      { task: "EF", reason: "EF < 35% (severely reduced)" },
+      { task: "LVSystolicFunction", reason: "Severely reduced LV function" },
+    ],
+  },
+  {
+    id: "study-002",
+    patient_id: "PT-2026-0087",
+    patient_age: 54,
+    patient_sex: "F",
+    modality: "echo",
+    study_type: "TTE — Parasternal long axis",
+    study_time: "2026-09-16 09:32",
+    status: "preliminary",
+    critical: false,
+    ai_summary: "EF = 62% (normal). No significant valvular disease. Normal LV systolic function.",
+    findings: [
+      { name: "Ejection fraction", value: "62%", type: "regression", confidence: 0.91, unit: "%" },
+      { name: "LV systolic function", value: "normal", type: "classification", confidence: 0.93 },
+      { name: "AV stenosis", value: "none", type: "classification", confidence: 0.97 },
+      { name: "MV regurgitation", value: "trivial", type: "classification", confidence: 0.85 },
+      { name: "Pericardial effusion", value: "none", type: "classification", confidence: 0.98 },
+    ],
+    critical_findings: [],
+  },
+  {
+    id: "study-003",
+    patient_id: "PT-2026-0103",
+    patient_age: 72,
+    patient_sex: "M",
+    modality: "ecg",
+    study_type: "12-lead ECG — 10 seconds",
+    study_time: "2026-09-16 10:08",
+    status: "preliminary",
+    critical: true,
+    ai_summary: "Atrial fibrillation with rapid ventricular response (HR 132). ST elevation in inferior leads (II, III, aVF) — possible inferior STEMI.",
+    findings: [
+      { name: "Heart rate", value: "132 bpm", type: "regression", confidence: 0.99, unit: "bpm" },
+      { name: "Rhythm", value: "atrial_fibrillation", type: "classification", confidence: 0.96 },
+      { name: "PR interval", value: "—", type: "regression", confidence: 0.0, unit: "ms" },
+      { name: "QRS duration", value: "94 ms", type: "regression", confidence: 0.97, unit: "ms" },
+      { name: "QTc interval", value: "412 ms", type: "regression", confidence: 0.94, unit: "ms" },
+      { name: "STEMI (inferior)", value: "yes", type: "classification", confidence: 0.78 },
+      { name: "STEMI (anterior)", value: "no", type: "classification", confidence: 0.92 },
+    ],
+    critical_findings: [
+      { task: "rhythm", reason: "Atrial fibrillation with RVR" },
+      { task: "STEMI_inferior", reason: "Possible inferior STEMI (confidence 78%)" },
+    ],
+  },
+  {
+    id: "study-004",
+    patient_id: "PT-2026-0118",
+    patient_age: 45,
+    patient_sex: "F",
+    modality: "ecg",
+    study_type: "12-lead ECG — 10 seconds",
+    study_time: "2026-09-16 10:45",
+    status: "preliminary",
+    critical: false,
+    ai_summary: "Normal sinus rhythm. HR 72 bpm. Intervals within normal limits. No acute ischemic changes.",
+    findings: [
+      { name: "Heart rate", value: "72 bpm", type: "regression", confidence: 0.99, unit: "bpm" },
+      { name: "Rhythm", value: "sinus_rhythm", type: "classification", confidence: 0.97 },
+      { name: "PR interval", value: "162 ms", type: "regression", confidence: 0.95, unit: "ms" },
+      { name: "QRS duration", value: "88 ms", type: "regression", confidence: 0.96, unit: "ms" },
+      { name: "QTc interval", value: "408 ms", type: "regression", confidence: 0.93, unit: "ms" },
+      { name: "STEMI", value: "no", type: "classification", confidence: 0.95 },
+    ],
+    critical_findings: [],
+  },
+  {
+    id: "study-005",
+    patient_id: "PT-2026-0125",
+    patient_age: 81,
+    patient_sex: "M",
+    modality: "echo",
+    study_type: "TTE — Apical 4-chamber",
+    study_time: "2026-09-16 11:12",
+    status: "preliminary",
+    critical: false,
+    ai_summary: "EF = 48% (mildly reduced). LVH present. Grade 1 diastolic dysfunction. Mild aortic regurgitation.",
+    findings: [
+      { name: "Ejection fraction", value: "48%", type: "regression", confidence: 0.84, unit: "%" },
+      { name: "LV systolic function", value: "mildly_reduced", type: "classification", confidence: 0.79 },
+      { name: "LV hypertrophy", value: "present", type: "classification", confidence: 0.86 },
+      { name: "Diastolic grade", value: "grade_1", type: "classification", confidence: 0.72 },
+      { name: "AV regurgitation", value: "mild", type: "classification", confidence: 0.81 },
+    ],
+    critical_findings: [],
+  },
+];
+
+let currentStudy = STUDIES[0];
+let isPlaying = false;
+let echoFrame = 0;
+
+// ============================================================
+// RENDER WORKLIST
+// ============================================================
+
+function renderWorklist(filter = "all") {
+  const container = document.getElementById("worklist-items");
+  const filtered = filter === "all" ? STUDIES : STUDIES.filter(s => s.modality === filter);
+  document.getElementById("worklist-count").textContent = filtered.length;
+
+  container.innerHTML = filtered.map(s => `
+    <div class="worklist-item ${s.id === currentStudy.id ? 'active' : ''}"
+         onclick="selectStudy('${s.id}')">
+      <div class="study-info">
+        <div>
+          <div class="patient-id">${s.patient_id}</div>
+          <div class="study-type">${s.study_type}</div>
+          <div>
+            ${s.critical ? '<span class="critical-flag">⚠ CRITICAL</span>' : ''}
+            <span class="ai-flag">AI</span>
+          </div>
+        </div>
+        <div class="study-time">${s.study_time.split(' ')[1]}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function filterWorklist() {
+  const filter = document.getElementById("filter-modality").value;
+  renderWorklist(filter);
+}
+
+function selectStudy(studyId) {
+  currentStudy = STUDIES.find(s => s.id === studyId);
+  renderWorklist(document.getElementById("filter-modality").value);
+  renderViewer();
+  renderAiRead();
+}
+
+// ============================================================
+// RENDER VIEWER (center)
+// ============================================================
+
+function renderViewer() {
+  const viewer = document.getElementById("viewer");
+  const s = currentStudy;
+
+  if (!s) {
+    viewer.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div>Select a study from the worklist</div></div>';
+    return;
+  }
+
+  const isEcho = s.modality === "echo";
+  viewer.innerHTML = `
+    <div class="viewer-header">
+      <div>
+        <div class="study-title">${s.study_type}</div>
+        <div class="study-meta">
+          Patient: ${s.patient_id} (${s.patient_age}${s.patient_sex}) ·
+          ${s.study_time} ·
+          <span class="status-badge status-${s.status}">${s.status}</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="alert('FHIR bundle copied (mock)')">View FHIR</button>
+        <button class="btn btn-success" onclick="openSignoff()">Sign off</button>
+      </div>
+    </div>
+    <div class="viewer-body">
+      <div class="viewer-section">
+        <h3>${isEcho ? 'Echo video' : 'ECG trace'}</h3>
+        ${isEcho ? renderEchoPlayer() : renderEcgTrace()}
+        ${isEcho ? `
+          <div class="echo-controls">
+            <button onclick="togglePlay()" id="play-btn">▶</button>
+            <input type="range" min="0" max="60" value="0" id="frame-slider" oninput="seekFrame(this.value)">
+            <span id="frame-label">0/60</span>
+          </div>
+        ` : ''}
+      </div>
+      <div class="viewer-section">
+        <h3>AI-detected region</h3>
+        <div style="background:#000;border-radius:4px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;text-align:center;padding:12px;">
+          ${isEcho ? '🫀 LV segmentation overlay<br/>(AI mask shown in green)' : '❤️ R-peak markers shown in red'}
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (isEcho) startEchoAnimation();
+}
+
+function renderEchoPlayer() {
+  return `
+    <div class="echo-player">
+      <canvas id="echo-canvas" width="320" height="240"></canvas>
+      <div class="play-overlay" onclick="togglePlay()" id="play-overlay">▶</div>
+    </div>
+  `;
+}
+
+function renderEcgTrace() {
+  return `
+    <div class="ecg-trace">
+      <canvas id="ecg-canvas" width="800" height="200"></canvas>
+    </div>
+  `;
+}
+
+// ============================================================
+// ECHO ANIMATION (synthetic heart)
+// ============================================================
+
+function startEchoAnimation() {
+  const canvas = document.getElementById("echo-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  echoFrame = 0;
+  isPlaying = false;
+  updatePlayButton();
+
+  function draw() {
+    if (!isPlaying) return;
+    echoFrame = (echoFrame + 1) % 60;
+    document.getElementById("frame-slider").value = echoFrame;
+    document.getElementById("frame-label").textContent = `${echoFrame}/60`;
+
+    // Synthetic ultrasound sector
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, 320, 240);
+
+    // Ultrasound cone
+    ctx.fillStyle = "#1a1a2e";
+    ctx.beginPath();
+    ctx.moveTo(160, 240);
+    ctx.arc(160, 240, 200, Math.PI + 0.5, Math.PI - 0.5, true);
+    ctx.closePath();
+    ctx.fill();
+
+    // Heart (LV) — pulsing
+    const phase = (echoFrame / 60) * 2 * Math.PI;
+    const beat = Math.sin(phase) * 0.3 + 1; // 0.7 to 1.3
+    const cx = 160, cy = 130;
+    const baseRadius = 50;
+
+    // LV cavity (darker)
+    ctx.fillStyle = "#2d1b1b";
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, baseRadius * beat, baseRadius * beat * 0.85, 0, 0, 2*Math.PI);
+    ctx.fill();
+
+    // LV wall
+    ctx.strokeStyle = "#8b3a3a";
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, baseRadius * beat + 6, baseRadius * beat * 0.85 + 6, 0, 0, 2*Math.PI);
+    ctx.stroke();
+
+    // AI segmentation overlay (green)
+    ctx.strokeStyle = "#38a169";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, baseRadius * beat, baseRadius * beat * 0.85, 0, 0, 2*Math.PI);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Label
+    ctx.fillStyle = "#fff";
+    ctx.font = "10px monospace";
+    ctx.fillText(`Frame ${echoFrame}/60`, 8, 16);
+    ctx.fillText(`EF (AI): ${currentStudy.findings.find(f=>f.name.includes('Ejection'))?.value || '?'}`,
+                8, 230);
+
+    if (isPlaying) requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function togglePlay() {
+  isPlaying = !isPlaying;
+  updatePlayButton();
+  if (isPlaying) startEchoAnimation();
+}
+
+function updatePlayButton() {
+  const btn = document.getElementById("play-btn");
+  const overlay = document.getElementById("play-overlay");
+  if (btn) btn.textContent = isPlaying ? "⏸" : "▶";
+  if (overlay) overlay.style.display = isPlaying ? "none" : "flex";
+}
+
+function seekFrame(frame) {
+  echoFrame = parseInt(frame);
+  document.getElementById("frame-label").textContent = `${echoFrame}/60`;
+  isPlaying = false;
+  updatePlayButton();
+  // Force redraw
+  const canvas = document.getElementById("echo-canvas");
+  if (canvas) {
+    isPlaying = true;
+    startEchoAnimation();
+    isPlaying = false;
+  }
+}
+
+// ============================================================
+// AI PRE-READ PANEL (right)
+// ============================================================
+
+function renderAiRead() {
+  const panel = document.getElementById("ai-read");
+  const s = currentStudy;
+
+  if (!s) {
+    panel.innerHTML = '<div class="empty-state"><div class="icon">🤖</div><div>Select a study</div></div>';
+    return;
+  }
+
+  const findingsHtml = s.findings.map(f => {
+    const conf = f.confidence;
+    const confClass = conf >= 0.85 ? '' : (conf >= 0.6 ? 'low' : 'indeterminate');
+    const confPct = Math.round(conf * 100);
+    return `
+      <div class="finding">
+        <div>
+          <div class="finding-name">${f.name}</div>
+          <div style="font-size:10px;color:#a0aec0;">${f.type}</div>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <span class="finding-value">${f.value}</span>
+          <div class="confidence-bar"><div class="confidence-fill ${confClass}" style="width:${confPct}%"></div></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  const fhirBundle = {
+    resourceType: "DiagnosticReport",
+    status: s.status,
+    code: { coding: [{ system: "http://loinc.org", code: s.modality === "echo" ? "26520-0" : "11524-6" }] },
+    subject: { reference: `Patient/${s.patient_id}` },
+    effectiveDateTime: s.study_time,
+    conclusion: s.ai_summary,
+    contained: s.findings.map((f, i) => ({
+      resourceType: "Observation",
+      id: `obs-${i}`,
+      code: { text: f.name },
+      valueQuantity: f.type === "regression"
+        ? { value: parseFloat(f.value), unit: f.unit || "" }
+        : undefined,
+      valueCodeableConcept: f.type === "classification"
+        ? { text: f.value }
+        : undefined,
+    })),
+  };
+
+  panel.innerHTML = `
+    <div class="ai-read-header">
+      <h2>AI pre-read</h2>
+      <div class="ai-badge">PanEcho + ECG-FM · ${s.modality.toUpperCase()}</div>
+    </div>
+
+    <div class="ai-summary">
+      <div class="summary-text">${s.ai_summary}</div>
+      ${s.critical_findings.length > 0 ? `
+        <div class="critical">⚠ ${s.critical_findings.length} critical finding${s.critical_findings.length > 1 ? 's' : ''}</div>
+      ` : ''}
+    </div>
+
+    <div class="ai-section">
+      <h3>Critical findings (${s.critical_findings.length})</h3>
+      ${s.critical_findings.length === 0
+        ? '<div style="font-size:12px;color:#a0aec0;">None flagged</div>'
+        : s.critical_findings.map(c => `
+          <div class="finding">
+            <div class="finding-name">${c.task}</div>
+            <div class="finding-value" style="color:#c53030;font-size:11px;">${c.reason}</div>
+          </div>
+        `).join("")
+      }
+    </div>
+
+    <div class="ai-section">
+      <h3>All findings (${s.findings.length})</h3>
+      ${findingsHtml}
+    </div>
+
+    <div class="ai-section">
+      <h3>FHIR R4 bundle</h3>
+      <div class="fhir-viewer">${JSON.stringify(fhirBundle, null, 2).substring(0, 600)}...</div>
+    </div>
+  `;
+}
+
+// ============================================================
+// SIGN-OFF
+// ============================================================
+
+function openSignoff() {
+  document.getElementById("signoff-modal").style.display = "flex";
+}
+
+function closeSignoff() {
+  document.getElementById("signoff-modal").style.display = "none";
+}
+
+function confirmSignoff() {
+  const name = document.getElementById("signoff-name").value;
+  const comment = document.getElementById("signoff-comment").value;
+
+  // Update study status
+  currentStudy.status = "final";
+  currentStudy.signed_by = name;
+  currentStudy.signoff_comment = comment;
+
+  closeSignoff();
+  renderViewer();
+  renderAiRead();
+
+  // Show confirmation
+  setTimeout(() => {
+    alert(`✅ Report signed off by ${name}\nStatus: preliminary → final\n\nThe report is now the official interpretation.`);
+  }, 100);
+}
+
+// ============================================================
+// INITIAL RENDER
+// ============================================================
+
+renderWorklist();
+renderViewer();
+renderAiRead();
+</script>
+
+</body>
+</html>
