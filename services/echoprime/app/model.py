@@ -47,6 +47,7 @@ class EchoPrimeModel:
         self._model = None
         self._processor = None
         self._loaded = False
+        self.weights_available = False
 
     @classmethod
     def get(cls, **kwargs) -> "EchoPrimeModel":
@@ -55,7 +56,12 @@ class EchoPrimeModel:
         return cls._instance
 
     def load(self) -> None:
-        """Download weights from HF Hub and instantiate the model."""
+        """Download weights from HF Hub and instantiate the model.
+
+        If weights are unavailable (team hasn't released them yet), sets
+        `self.weights_available = False` and returns without raising.
+        Callers should check `weights_available` and fall back to PanEcho.
+        """
         if self._loaded:
             return
 
@@ -83,16 +89,18 @@ class EchoPrimeModel:
                 revision=self.revision,
                 trust_remote_code=True,
             )
+            self.weights_available = True
         except Exception as e:
-            logger.error(
-                "Could not load EchoPrime from %s. The model may not yet be "
-                "publicly released, or your HF token lacks access. Error: %s",
+            logger.warning(
+                "EchoPrime weights unavailable at %s. Falling back to PanEcho "
+                "for echo analysis. Error: %s",
                 self.repo_id, e,
             )
-            raise
+            self._model = None
+            self._processor = None
+            self.weights_available = False
 
-        self._loaded = True
-        logger.info("EchoPrime ready.")
+        self._loaded = True  # mark as "checked" even if weights missing
 
     @torch.inference_mode()
     def analyze(

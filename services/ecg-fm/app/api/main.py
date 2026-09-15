@@ -73,10 +73,47 @@ def _stub_predictions() -> Dict[str, Any]:
     }
 
 
+# Confidence gating thresholds
+MIN_CONFIDENCE_FOR_PREDICTION = 0.60  # below this -> "indeterminate"
+MIN_SIGNAL_QUALITY_FOR_PREDICTION = 0.40  # below this -> refuse to predict
+
+
+def _apply_confidence_gating(
+    arrhythmia_preds: Dict[str, float],
+) -> Dict[str, Any]:
+    """Apply confidence gating to arrhythmia predictions.
+
+    Returns the predicted arrhythmia + a confidence_flag:
+    - "high_confidence" — max probability >= 0.85
+    - "indeterminate" — max probability < 0.60
+    - "moderate_confidence" — between 0.60 and 0.85
+    """
+    if not arrhythmia_preds:
+        return {"predicted": None, "confidence": 0.0, "flag": "indeterminate"}
+
+    max_key = max(arrhythmia_preds, key=arrhythmia_preds.get)
+    max_prob = float(arrhythmia_preds[max_key])
+
+    if max_prob < MIN_CONFIDENCE_FOR_PREDICTION:
+        flag = "indeterminate"
+    elif max_prob >= 0.85:
+        flag = "high_confidence"
+    else:
+        flag = "moderate_confidence"
+
+    return {
+        "predicted": max_key,
+        "confidence": round(max_prob, 4),
+        "flag": flag,
+    }
+
+
 class ECGPrediction(BaseModel):
     patient_id: str
     intervals: Dict[str, float]
     arrhythmia: Dict[str, float]
+    arrhythmia_prediction: Dict[str, Any]  # {predicted, confidence, flag}
+    signal_quality: Optional[Dict[str, Any]]  # quality gate result
     conclusion: str
     inference_ms: float
     fhir: dict
@@ -137,19 +174,77 @@ async def predict(
 
     dt_ms = (time.perf_counter() - t0) * 1000
 
+    # Signal quality assessment
+    from cardio_echo_core.accuracy import assess_image_quality
+    quality_gate = assess_image_quality(ecg)
+    signal_quality = {
+        "is_acceptable": quality_gate.is_acceptable,
+        "quality_score": quality_gate.quality_score,
+        "reasons": quality_gate.reasons,
+    }
+
+    # If signal quality is too low, refuse to predict arrhythmia
+    if quality_gate.quality_score < MIN_SIGNAL_QUALITY_FOR_PREDICTION:
+        return ECGPrediction(
+            patient_id=patient_id,
+            intervals=preds.get("intervals", {}),
+            arrhythmia={},
+            arrhythmia_prediction={
+                "predicted": None,
+                "confidence": 0.0,
+                "flag": "refused_low_quality",
+            },
+            signal_quality=signal_quality,
+            conclusion=(
+                "ECG signal quality too low for reliable AI interpretation. "
+                f"Quality score: {quality_gate.quality_score:.2f}. "
+                "Recommend manual review."
+            ),
+            inference_ms=round(dt_ms, 1),
+            fhir={
+                "resourceType": "OperationOutcome",
+                "issue": [{
+                    "severity": "warning",
+                    "code": "incomplete",
+                    "details": {"text": "ECG signal quality below threshold for AI prediction"},
+                }],
+            },
+        )
+
+    # Apply confidence gating to arrhythmia predictions
+    arrhythmia_gating = _apply_confidence_gating(preds.get("arrhythmia", {}))
+
+    # Build FHIR report
     fhir = build_ecg_diagnostic_report(
-        intervals=preds["intervals"],
-        arrhythmia_predictions=preds["arrhythmia"],
+        intervals=preds.get("intervals", {}),
+        arrhythmia_predictions=preds.get("arrhythmia", {}),
         patient_id=patient_id,
         encounter_id=encounter_id,
         study_instance_uid=study_uid,
     )
 
+    # If arrhythmia is indeterminate, add a note to the FHIR report
+    if arrhythmia_gating["flag"] == "indeterminate":
+        fhir.setdefault("note", []).append({
+            "text": (
+                "AI confidence below threshold (max probability < 0.60). "
+                "Predictions marked as indeterminate — manual review required."
+            ),
+        })
+        conclusion = (
+            "ECG AI pre-read: indeterminate (low confidence). "
+            "Manual interpretation required."
+        )
+    else:
+        conclusion = fhir.get("conclusion", "")
+
     return ECGPrediction(
         patient_id=patient_id,
-        intervals=preds["intervals"],
-        arrhythmia=preds["arrhythmia"],
-        conclusion=fhir["conclusion"],
+        intervals=preds.get("intervals", {}),
+        arrhythmia=preds.get("arrhythmia", {}),
+        arrhythmia_prediction=arrhythmia_gating,
+        signal_quality=signal_quality,
+        conclusion=conclusion,
         inference_ms=round(dt_ms, 1),
         fhir=fhir,
     )

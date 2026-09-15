@@ -72,7 +72,18 @@ def readyz():
             m.load()
         except Exception as e:
             raise HTTPException(status_code=503, detail=f"Model not loaded: {e}")
-    return {"status": "ready", "device": m.device, "repo_id": m.repo_id}
+    return {
+        "status": "ready" if m.weights_available else "degraded",
+        "device": m.device,
+        "repo_id": m.repo_id,
+        "weights_available": m.weights_available,
+        "fallback_active": not m.weights_available,
+        "fallback_message": (
+            "EchoPrime weights not publicly released yet. "
+            "Echo studies should be routed to PanEcho (/v1/echo/full with skip=echoprime)."
+            if not m.weights_available else None
+        ),
+    }
 
 
 # ---------------------------------------------------------------
@@ -103,6 +114,28 @@ async def analyze(
             m.load()
         except Exception as e:
             raise HTTPException(status_code=503, detail=f"Model load failed: {e}")
+
+    # If EchoPrime weights are unavailable, return a structured fallback response
+    # telling the caller to use PanEcho instead.
+    if not m.weights_available:
+        tmp_path.unlink(missing_ok=True)
+        return EchoAnalysisResult(
+            views=["unknown"],
+            measurements={},
+            draft_report=(
+                "EchoPrime weights are not yet publicly released. "
+                "Please use PanEcho (/v1/echo/full with skip=echonet,echoprime) "
+                "for echo analysis until the EchoPrime team publishes weights."
+            ),
+            fhir={
+                "resourceType": "OperationOutcome",
+                "issue": [{
+                    "severity": "warning",
+                    "code": "not-supported",
+                    "details": {"text": "EchoPrime weights unavailable — use PanEcho fallback"},
+                }],
+            },
+        )
 
     try:
         out = m.analyze(tmp_path)

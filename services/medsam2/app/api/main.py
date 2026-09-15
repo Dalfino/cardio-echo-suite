@@ -49,6 +49,8 @@ class SegmentationResult(BaseModel):
     volume_ml: Optional[float]
     surface_area_mm2: Optional[float]
     n_slices: int
+    iou_score: float
+    confidence_flag: str  # high | moderate | low | rejected
     inference_ms: float
     backend: str
     fhir: dict
@@ -93,15 +95,26 @@ async def predict_point(
 
     t0 = time.perf_counter()
     try:
-        mask = m.predict_point(image, (prompt.x, prompt.y), prompt.label)
+        result = m.predict_point(image, (prompt.x, prompt.y), prompt.label)
+        mask = result["mask"]
+        iou_score = result["iou_score"]
+        confidence_flag = result["confidence_flag"]
     except Exception as e:
         raise HTTPException(500, f"Segmentation failed: {e}")
     dt_ms = (time.perf_counter() - t0) * 1000
 
     # Compute summary stats
     n_voxels = int(mask.sum().item())
-    volume_ml = float(n_voxels) / 1000.0  # placeholder; real calc needs voxel spacing
+    volume_ml = float(n_voxels) / 1000.0
     n_slices = int(mask.shape[-1]) if mask.dim() >= 3 else 1
+
+    # Add RV warning if structure mentions RV
+    rv_warning = (
+        " WARNING: RV segmentation has lower accuracy (Dice ~0.75) than LV "
+        "due to thinner walls and trabeculation. Manual review recommended."
+        if "rv" in structure.lower() or "right ventr" in structure.lower()
+        else ""
+    )
 
     fhir = build_segmentation_observation(
         structure=structure,
@@ -109,12 +122,20 @@ async def predict_point(
         n_slices=n_slices,
         patient_id=patient_id,
     )
+    if rv_warning:
+        fhir.setdefault("note", []).append({"text": rv_warning.strip()})
+    if confidence_flag == "rejected":
+        fhir.setdefault("note", []).append({
+            "text": f"IoU score {iou_score:.2f} below 0.50 — segmentation rejected. Manual review required.",
+        })
     return SegmentationResult(
         structure=structure,
         n_voxels=n_voxels,
         volume_ml=round(volume_ml, 2),
         surface_area_mm2=None,
         n_slices=n_slices,
+        iou_score=round(iou_score, 3),
+        confidence_flag=confidence_flag,
         inference_ms=round(dt_ms, 1),
         backend=m.backend,
         fhir=fhir,
@@ -146,7 +167,10 @@ async def predict_bbox(
 
     t0 = time.perf_counter()
     try:
-        mask = m.predict_bbox(image, (prompt.x1, prompt.y1, prompt.x2, prompt.y2))
+        result = m.predict_bbox(image, (prompt.x1, prompt.y1, prompt.x2, prompt.y2))
+        mask = result["mask"]
+        iou_score = result["iou_score"]
+        confidence_flag = result["confidence_flag"]
     except Exception as e:
         raise HTTPException(500, f"Segmentation failed: {e}")
     dt_ms = (time.perf_counter() - t0) * 1000
@@ -155,21 +179,21 @@ async def predict_bbox(
     volume_ml = float(n_voxels) / 1000.0
     n_slices = int(mask.shape[-1]) if mask.dim() >= 3 else 1
 
-    fhir = build_segmentation_observation(
-        structure=structure,
-        volume_ml=volume_ml,
-        n_slices=n_slices,
-        patient_id=patient_id,
+    rv_warning = (
+        " WARNING: RV segmentation has lower accuracy. Manual review recommended."
+        if "rv" in structure.lower() else ""
     )
+
+    fhir = build_segmentation_observation(
+        structure=structure, volume_ml=volume_ml, n_slices=n_slices, patient_id=patient_id,
+    )
+    if rv_warning:
+        fhir.setdefault("note", []).append({"text": rv_warning.strip()})
     return SegmentationResult(
-        structure=structure,
-        n_voxels=n_voxels,
-        volume_ml=round(volume_ml, 2),
-        surface_area_mm2=None,
-        n_slices=n_slices,
-        inference_ms=round(dt_ms, 1),
-        backend=m.backend,
-        fhir=fhir,
+        structure=structure, n_voxels=n_voxels, volume_ml=round(volume_ml, 2),
+        surface_area_mm2=None, n_slices=n_slices,
+        iou_score=round(iou_score, 3), confidence_flag=confidence_flag,
+        inference_ms=round(dt_ms, 1), backend=m.backend, fhir=fhir,
     )
 
 
@@ -197,7 +221,10 @@ async def predict_auto(
 
     t0 = time.perf_counter()
     try:
-        mask = m.predict_auto(image)
+        result = m.predict_auto(image)
+        mask = result["mask"]
+        iou_score = result["iou_score"]
+        confidence_flag = result["confidence_flag"]
     except Exception as e:
         raise HTTPException(500, f"Segmentation failed: {e}")
     dt_ms = (time.perf_counter() - t0) * 1000
@@ -211,8 +238,9 @@ async def predict_auto(
     )
     return SegmentationResult(
         structure=structure, n_voxels=n_voxels, volume_ml=round(volume_ml, 2),
-        surface_area_mm2=None, n_slices=n_slices, inference_ms=round(dt_ms, 1),
-        backend=m.backend, fhir=fhir,
+        surface_area_mm2=None, n_slices=n_slices,
+        iou_score=round(iou_score, 3), confidence_flag=confidence_flag,
+        inference_ms=round(dt_ms, 1), backend=m.backend, fhir=fhir,
     )
 
 

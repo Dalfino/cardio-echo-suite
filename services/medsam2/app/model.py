@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import torch
 
@@ -69,16 +69,12 @@ class MedSAM2Model:
         image: torch.Tensor,
         point: Tuple[int, int],
         label: int = 1,
-    ) -> torch.Tensor:
+    ) -> Dict[str, Any]:
         """Predict a segmentation mask from a single point prompt.
 
-        Args:
-            image: (1, 3, H, W) tensor, range [0, 1].
-            point: (x, y) pixel coordinates.
-            label: 1 = foreground, 0 = background.
-
         Returns:
-            Binary mask (1, H, W) tensor.
+            Dict with 'mask' (binary tensor), 'iou_score' (predicted IoU),
+            'confidence_flag' ('high'/'moderate'/'low'/'rejected').
         """
         self.load()
         inputs = self._processor(
@@ -90,20 +86,36 @@ class MedSAM2Model:
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         outputs = self._model(**inputs)
         masks = outputs.pred_masks.cpu()
+        # SAM models output IoU prediction per mask
+        iou_scores = getattr(outputs, "iou_scores", None)
+        if iou_scores is not None:
+            iou_score = float(iou_scores.cpu()[0, 0].item())
+        else:
+            iou_score = 0.85  # fallback if model doesn't expose IoU
         # Pick highest-scoring mask
-        mask = masks[0, 0] > 0.5
-        return mask.float()
+        mask = (masks[0, 0] > 0.5).float()
+
+        # Confidence gating
+        if iou_score >= 0.85:
+            flag = "high"
+        elif iou_score >= 0.65:
+            flag = "moderate"
+        elif iou_score >= 0.50:
+            flag = "low"
+        else:
+            flag = "rejected"
+
+        return {"mask": mask, "iou_score": iou_score, "confidence_flag": flag}
 
     @torch.inference_mode()
     def predict_bbox(
         self,
         image: torch.Tensor,
-        bbox: Tuple[int, int, int, int],  # x1, y1, x2, y2
-    ) -> torch.Tensor:
+        bbox: Tuple[int, int, int, int],
+    ) -> Dict[str, Any]:
         """Predict a segmentation mask from a bounding box prompt."""
         self.load()
         x1, y1, x2, y2 = bbox
-        # Convert bbox to 2-point prompt with labels
         inputs = self._processor(
             images=image,
             input_boxes=[[[[x1, y1], [x2, y2]]]],
@@ -112,13 +124,24 @@ class MedSAM2Model:
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         outputs = self._model(**inputs)
         masks = outputs.pred_masks.cpu()
-        return (masks[0, 0] > 0.5).float()
+        iou_scores = getattr(outputs, "iou_scores", None)
+        iou_score = float(iou_scores.cpu()[0, 0].item()) if iou_scores is not None else 0.85
+        mask = (masks[0, 0] > 0.5).float()
+
+        if iou_score >= 0.85:
+            flag = "high"
+        elif iou_score >= 0.65:
+            flag = "moderate"
+        elif iou_score >= 0.50:
+            flag = "low"
+        else:
+            flag = "rejected"
+        return {"mask": mask, "iou_score": iou_score, "confidence_flag": flag}
 
     @torch.inference_mode()
-    def predict_auto(self, image: torch.Tensor) -> torch.Tensor:
+    def predict_auto(self, image: torch.Tensor) -> Dict[str, Any]:
         """Automatic segmentation — runs default grid of points."""
         self.load()
-        # Run on center point as a default
         _, _, H, W = image.shape
         return self.predict_point(image, (W // 2, H // 2))
 

@@ -220,11 +220,108 @@ async def imaging_full(
                       inference_ms=round(dt_ms, 1), results=out)
 
 
+# ---------------------------------------------------------------
+# FHIR Composition — ties echo + ECG reports for one patient
+# ---------------------------------------------------------------
+
+class CompositionResult(BaseModel):
+    patient_id: str
+    inference_ms: float
+    composition: Dict[str, Any]
+    echo_report: Optional[Dict[str, Any]] = None
+    ecg_report: Optional[Dict[str, Any]] = None
+
+
+@app.post("/v1/composition", response_model=CompositionResult)
+async def composition(
+    echo_file: Optional[UploadFile] = File(None, description="Echo video file"),
+    ecg_file: Optional[UploadFile] = File(None, description="ECG file"),
+    patient_id: str = Query("unknown"),
+    encounter_id: Optional[str] = Query(None),
+    study_uid: Optional[str] = Query(None),
+):
+    """Run echo + ECG services in parallel and emit a FHIR R4 Composition
+    that ties both reports together for one patient encounter.
+    """
+    from cardio_echo_core.fhir import build_composition, build_bundle
+
+    t0 = time.perf_counter()
+    echo_report = None
+    ecg_report = None
+
+    async with httpx.AsyncClient(timeout=TIMEOUT_S) as client:
+        tasks = {}
+        if echo_file:
+            echo_content = await echo_file.read()
+            echo_params = {
+                "patient_id": patient_id,
+                "study_uid": study_uid or "",
+                "skip": "echonet,echoprime",  # PanEcho only for speed
+            }
+            tasks["echo"] = _forward(client, "panecho", "/predict",
+                                     echo_file.filename or "echo.mp4",
+                                     echo_content, {**echo_params, "dry_run": "true"})
+
+        if ecg_file:
+            ecg_content = await ecg_file.read()
+            ecg_params = {"patient_id": patient_id, "study_uid": study_uid or "", "dry_run": "true"}
+            tasks["ecg"] = _forward(client, "ecg-fm", "/predict",
+                                    ecg_file.filename or "ecg.csv",
+                                    ecg_content, ecg_params)
+
+        if tasks:
+            results = await asyncio.gather(*tasks.values(), return_exceptions=True)
+            out = dict(zip(tasks.keys(), results))
+            if "echo" in out and not isinstance(out["echo"], Exception):
+                echo_report = out["echo"]
+            if "ecg" in out and not isinstance(out["ecg"], Exception):
+                ecg_report = out["ecg"]
+
+    dt_ms = (time.perf_counter() - t0) * 1000
+
+    # Build FHIR Composition sections
+    sections = []
+    if echo_report and "fhir_bundle" in (echo_report or {}):
+        sections.append({
+            "title": "Echocardiography AI pre-read",
+            "entry": [{"reference": f"urn:uuid:{echo_report['fhir_bundle'].get('id', '')}"}],
+        })
+    if ecg_report and "fhir" in (ecg_report or {}):
+        sections.append({
+            "title": "ECG AI pre-read",
+            "entry": [{"reference": f"urn:uuid:{ecg_report['fhir'].get('id', '')}"}],
+        })
+
+    composition = build_composition(
+        title="Cardiac AI Suite pre-read summary",
+        patient_id=patient_id,
+        sections=sections,
+        encounter_id=encounter_id,
+        study_instance_uid=study_uid,
+    )
+
+    # Add contained resources (the actual reports)
+    contained = []
+    if echo_report and "fhir_bundle" in echo_report:
+        contained.append(echo_report["fhir_bundle"])
+    if ecg_report and "fhir" in ecg_report:
+        contained.append(ecg_report["fhir"])
+    composition["contained"] = contained
+
+    return CompositionResult(
+        patient_id=patient_id,
+        inference_ms=round(dt_ms, 1),
+        composition=composition,
+        echo_report=echo_report,
+        ecg_report=ecg_report,
+    )
+
+
 @app.get("/")
 def root():
     return {
         "service": "cardio-echo-suite orchestrator v0.2.0",
-        "endpoints": ["/healthz", "/services", "/v1/echo/full", "/v1/ecg/full", "/v1/imaging/full"],
+        "endpoints": ["/healthz", "/services", "/v1/echo/full", "/v1/ecg/full", "/v1/imaging/full", "/v1/composition"],
         "downstream": SERVICES,
         "docs": "/docs",
     }
