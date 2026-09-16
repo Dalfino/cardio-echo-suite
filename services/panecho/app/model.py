@@ -80,9 +80,13 @@ class PanEchoModel:
         """
         self.load()
         x = video.to(self.device)
+        # Ensure shape is (1, 3, T, H, W) — PanEcho's expected input
         if x.dim() == 4:
-            x = x.unsqueeze(0)  # (T, 3, H, W) -> (1, T, 3, H, W)
-        if x.shape[2] != 3:
-            x = x.permute(0, 2, 1, 3, 4)  # fix channel dim if needed
+            # (3, T, H, W) or (T, 3, H, W) -> add batch dim
+            x = x.unsqueeze(0)
+        if x.dim() == 5 and x.shape[1] != 3:
+            # Channels not in position 1 — permute to (1, 3, T, H, W)
+            # Common case: (1, T, 3, H, W) -> (1, 3, T, H, W)
+            x = x.permute(0, 2, 1, 3, 4)
         out = self._model(x)
         return {k: v.detach().cpu() for k, v in out.items()}
