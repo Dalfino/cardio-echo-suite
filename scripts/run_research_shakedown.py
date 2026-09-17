@@ -118,6 +118,7 @@ def main(argv: List[str] | None = None) -> int:
     p.add_argument("--data-dir", type=Path, required=True, help="Path to EchoNet-Dynamic/ (containing Videos/ and FileList.csv)")
     p.add_argument("--output", type=Path, default=Path("/tmp/research_results.json"))
     p.add_argument("--max-n", type=int, default=50, help="Max videos to process (default 50)")
+    p.add_argument("--skip", type=int, default=0, help="Skip first N available videos (for batching)")
     p.add_argument("--real", action="store_true", help="Run real model inference (not dry-run). Downloads ~150MB weights on first run.")
     args = p.parse_args(argv)
 
@@ -133,8 +134,10 @@ def main(argv: List[str] | None = None) -> int:
     logger.info("Available on disk: %d / %d", len(available), len(test_studies))
 
     if args.max_n > 0:
-        available = available[:args.max_n]
-    logger.info("Will process %d videos", len(available))
+        available = available[args.skip:args.skip + args.max_n]
+    elif args.skip > 0:
+        available = available[args.skip:]
+    logger.info("Will process %d videos (skip=%d)", len(available), args.skip)
 
     predictions: List[Dict[str, Any]] = []
     t0 = time.perf_counter()
