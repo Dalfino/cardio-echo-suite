@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cardio-echo-ml"
+version = "0.1.0"
+description = "Commercial-grade ML engineering layer for cardio-echo-suite: TTA, ensemble, uncertainty, quality gate, consistency, failure mode detection"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "cardio-echo-suite authors"}]
+dependencies = [
+    "torch>=1.13",
+    "numpy>=1.22",
+    "scikit-learn>=1.1",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cardio_echo_ml*"]
