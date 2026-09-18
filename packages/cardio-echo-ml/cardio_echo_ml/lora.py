@@ -330,19 +330,31 @@ class LoRAFineTuner:
         dataset: HospitalDataset,
         output_dir: Union[str, Path],
         val_dataset: Optional[HospitalDataset] = None,
+        early_stopping_config: Optional[Any] = None,
     ) -> Path:
         """Fine-tune the model on hospital data.
 
         Args:
             dataset: training dataset
             output_dir: where to save adapter weights
-            val_dataset: optional validation dataset
+            val_dataset: optional validation dataset (REQUIRED for early stopping)
+            early_stopping_config: EarlyStoppingConfig (if None, uses preset for EF)
 
         Returns:
             Path to saved adapter weights
         """
+        from .early_stopping import EarlyStopping, get_preset_config
+
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Set up early stopping
+        if early_stopping_config is None:
+            early_stopping_config = get_preset_config("ef_regression")
+        early_stopping = EarlyStopping(early_stopping_config)
+        logger.info("Early stopping: monitor=%s, patience=%d, min_delta=%s, mode=%s",
+                    early_stopping_config.monitor, early_stopping_config.patience,
+                    early_stopping_config.min_delta, early_stopping_config.mode)
 
         # Wrap model with LoRA
         logger.info("Wrapping model with LoRA (r=%d, alpha=%d)...", self.lora_r, self.lora_alpha)
@@ -371,23 +383,20 @@ class LoRAFineTuner:
 
         for epoch in range(self.epochs):
             model.train()
-            # Force gradient computation (model might have been in inference mode)
             torch.set_grad_enabled(True)
             epoch_loss = 0.0
             n_batches = 0
 
             for batch in loader:
-                videos = batch["video"].squeeze(1).to(self.device)  # (B, 3, T, H, W)
+                videos = batch["video"].squeeze(1).to(self.device)
                 efs = batch["ef"].to(self.device)
 
-                # Handle batch dimension
                 if videos.dim() == 6:
                     videos = videos.squeeze(1)
 
                 optimizer.zero_grad()
                 try:
-                    # Force requires_grad on input to ensure grad flows
-                    videos.requires_grad_(False)  # Don't need grad on input
+                    videos.requires_grad_(False)
                     outputs = model(videos)
 
                     if isinstance(outputs, dict) and "EF" in outputs:
@@ -397,9 +406,7 @@ class LoRAFineTuner:
                     else:
                         preds = outputs
 
-                    # Ensure preds requires grad
                     if not preds.requires_grad:
-                        # Try calling with grad explicitly
                         with torch.enable_grad():
                             outputs = model(videos)
                             if isinstance(outputs, dict) and "EF" in outputs:
@@ -410,7 +417,6 @@ class LoRAFineTuner:
                                 preds = outputs
 
                     if not preds.requires_grad:
-                        logger.warning("Output still doesn't require grad — skipping batch")
                         continue
 
                     loss = criterion(preds, efs)
@@ -423,15 +429,30 @@ class LoRAFineTuner:
                     logger.warning("Batch failed: %s", e)
 
             avg_loss = epoch_loss / max(n_batches, 1)
-            logger.info("Epoch %d/%d: loss=%.4f", epoch + 1, self.epochs, avg_loss)
 
-            # Validation
+            # Validation + early stopping
+            val_mae = None
             if val_dataset:
                 val_mae = self._evaluate_mae(model, val_dataset)
-                logger.info("  Validation MAE: %.2f EF%%", val_mae)
+
+            logger.info("Epoch %d/%d: train_loss=%.4f val_mae=%s",
+                        epoch + 1, self.epochs, avg_loss,
+                        f"{val_mae:.2f}" if val_mae else "N/A")
 
             # Save checkpoint
             self._save_adapter(model, output_dir / f"epoch-{epoch}")
+
+            # Early stopping check
+            stop_result = early_stopping(
+                epoch=epoch,
+                model=model,
+                val_loss=avg_loss,
+                val_mae=val_mae,
+                train_loss=avg_loss,
+            )
+            if stop_result["should_stop"]:
+                logger.info("Training stopped early: %s", stop_result["reason"])
+                break
 
         # Save final adapter
         final_path = output_dir / "final"
