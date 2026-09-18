@@ -268,32 +268,61 @@ class LoRAFineTuner:
         try:
             from peft import LoraConfig, get_peft_model, TaskType  # type: ignore
 
+            # Try multiple target module patterns — different architectures use different names
+            # PanEcho uses ConvNeXt (timm) which has different layer names than transformers
+            target_modules = self.target_modules or [
+                # Transformer-style (won't match ConvNeXt but harmless)
+                "q_proj", "k_proj", "v_proj", "o_proj",
+                "gate_proj", "up_proj", "down_proj",
+                # ConvNeXt-style (PanEcho's backbone)
+                "fc1", "fc2", "proj",
+                # Task heads
+                "head",
+                # Generic Linear
+                "linear", "Linear",
+            ]
+
             config = LoraConfig(
                 r=self.lora_r,
                 lora_alpha=self.lora_alpha,
                 lora_dropout=self.lora_dropout,
                 bias="none",
-                target_modules=self.target_modules,
+                target_modules=target_modules,
                 task_type=TaskType.FEATURE_EXTRACTION,
             )
             model = get_peft_model(self.base_model, config)
             model.print_trainable_parameters()
+
+            # Check if PEFT actually found trainable params
+            n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+            if n_trainable < 1000:
+                logger.warning("PEFT found only %d trainable params — falling back to selective fine-tuning", n_trainable)
+                raise ImportError("PEFT didn't find enough target modules")
+
             return model
-        except ImportError:
+        except (ImportError, Exception) as e:
             logger.warning(
-                "PEFT not installed. Install with: pip install peft\n"
-                "Falling back to selective fine-tuning (last layer only)."
+                "PEFT LoRA not available or failed (%s). "
+                "Falling back to selective fine-tuning (unfreeze last layers).", e
             )
-            # Fallback: freeze all but last layer
+            # Fallback: freeze all, unfreeze last N Linear layers
             for param in self.base_model.parameters():
                 param.requires_grad = False
-            # Unfreeze last linear layer
-            for name, module in reversed(list(self.base_model.named_modules())):
+
+            # Find all Linear layers and unfreeze the last 5
+            linear_layers = []
+            for name, module in self.base_model.named_modules():
                 if isinstance(module, nn.Linear):
-                    for param in module.parameters():
-                        param.requires_grad = True
-                    logger.info("Fine-tuning layer: %s", name)
-                    break
+                    linear_layers.append((name, module))
+
+            # Unfreeze last 5 Linear layers (task heads are usually last)
+            for name, module in linear_layers[-5:]:
+                for param in module.parameters():
+                    param.requires_grad = True
+                logger.info("Fine-tuning layer: %s (%d params)", name, sum(p.numel() for p in module.parameters()))
+
+            n_trainable = sum(p.numel() for p in self.base_model.parameters() if p.requires_grad)
+            logger.info("Selective fine-tuning: %d trainable params", n_trainable)
             return self.base_model
 
     def fit(
@@ -342,6 +371,8 @@ class LoRAFineTuner:
 
         for epoch in range(self.epochs):
             model.train()
+            # Force gradient computation (model might have been in inference mode)
+            torch.set_grad_enabled(True)
             epoch_loss = 0.0
             n_batches = 0
 
@@ -355,13 +386,32 @@ class LoRAFineTuner:
 
                 optimizer.zero_grad()
                 try:
+                    # Force requires_grad on input to ensure grad flows
+                    videos.requires_grad_(False)  # Don't need grad on input
                     outputs = model(videos)
+
                     if isinstance(outputs, dict) and "EF" in outputs:
                         preds = outputs["EF"].squeeze()
                     elif isinstance(outputs, torch.Tensor):
                         preds = outputs.squeeze()
                     else:
                         preds = outputs
+
+                    # Ensure preds requires grad
+                    if not preds.requires_grad:
+                        # Try calling with grad explicitly
+                        with torch.enable_grad():
+                            outputs = model(videos)
+                            if isinstance(outputs, dict) and "EF" in outputs:
+                                preds = outputs["EF"].squeeze()
+                            elif isinstance(outputs, torch.Tensor):
+                                preds = outputs.squeeze()
+                            else:
+                                preds = outputs
+
+                    if not preds.requires_grad:
+                        logger.warning("Output still doesn't require grad — skipping batch")
+                        continue
 
                     loss = criterion(preds, efs)
                     loss.backward()
