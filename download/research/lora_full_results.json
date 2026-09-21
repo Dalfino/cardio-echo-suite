@@ -1,0 +1,54 @@
+{
+  "n_train": 30,
+  "n_val": 10,
+  "n_test": 20,
+  "trainable_params": 769,
+  "epochs_run": 7,
+  "best_epoch": 3,
+  "early_stopped": true,
+  "val_mae_before": 7.75,
+  "val_mae_best": 6.26,
+  "test_mae_raw": 7.84,
+  "test_mae_lora": 5.65,
+  "test_improvement": 2.19,
+  "test_improvement_pct": 27.9,
+  "beats_commercial": false,
+  "beats_sota": false,
+  "learning_curve": [
+    {
+      "epoch": 1,
+      "loss": 119.79,
+      "val_mae": 6.85
+    },
+    {
+      "epoch": 2,
+      "loss": 106.24,
+      "val_mae": 6.41
+    },
+    {
+      "epoch": 3,
+      "loss": 90.79,
+      "val_mae": 6.26
+    },
+    {
+      "epoch": 4,
+      "loss": 88.78,
+      "val_mae": 6.27
+    },
+    {
+      "epoch": 5,
+      "loss": 88.61,
+      "val_mae": 6.29
+    },
+    {
+      "epoch": 6,
+      "loss": 86.81,
+      "val_mae": 6.31
+    },
+    {
+      "epoch": 7,
+      "loss": 87.38,
+      "val_mae": 6.31
+    }
+  ]
+}
