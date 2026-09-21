@@ -1,0 +1,231 @@
+{
+  "ensemble_mode": "average",
+  "n_videos": 20,
+  "elapsed_s": 21.2,
+  "mae_panecho": 7.84,
+  "mae_echonet": null,
+  "mae_ensemble": 7.84,
+  "mean_agreement_gap": null,
+  "results": [
+    {
+      "filename": "0X100CF05D141FF143.avi",
+      "ef_gt": 55.95179045,
+      "ef_panecho": 63.76,
+      "ef_echonet": null,
+      "ef_ensemble": 63.76,
+      "error_panecho": 7.8,
+      "error_echonet": null,
+      "error_ensemble": 7.8,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X1012703CDC1436FE.avi",
+      "ef_gt": 41.01442459,
+      "ef_panecho": 49.68,
+      "ef_echonet": null,
+      "ef_ensemble": 49.68,
+      "error_panecho": 8.67,
+      "error_echonet": null,
+      "error_ensemble": 8.67,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X102CFB07F752AAE6.avi",
+      "ef_gt": 50.79471786,
+      "ef_panecho": 62.37,
+      "ef_echonet": null,
+      "ef_ensemble": 62.37,
+      "error_panecho": 11.58,
+      "error_echonet": null,
+      "error_ensemble": 11.58,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X105B9EF57DE45DCB.avi",
+      "ef_gt": 50.63498148,
+      "ef_panecho": 62.6,
+      "ef_echonet": null,
+      "ef_ensemble": 62.6,
+      "error_panecho": 11.97,
+      "error_echonet": null,
+      "error_ensemble": 11.97,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X10A28877E97DF540.avi",
+      "ef_gt": 63.09808593,
+      "ef_panecho": 65.61,
+      "ef_echonet": null,
+      "ef_ensemble": 65.61,
+      "error_panecho": 2.51,
+      "error_echonet": null,
+      "error_ensemble": 2.51,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X10B7505562B0A702.avi",
+      "ef_gt": 58.49443837,
+      "ef_panecho": 63.63,
+      "ef_echonet": null,
+      "ef_ensemble": 63.63,
+      "error_panecho": 5.13,
+      "error_echonet": null,
+      "error_ensemble": 5.13,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X10F6FD4A9C6A458E.avi",
+      "ef_gt": 67.38156571,
+      "ef_panecho": 64.44,
+      "ef_echonet": null,
+      "ef_ensemble": 64.44,
+      "error_panecho": 2.94,
+      "error_echonet": null,
+      "error_ensemble": 2.94,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X111EDA8A1E44169C.avi",
+      "ef_gt": 57.28490963,
+      "ef_panecho": 66.91,
+      "ef_echonet": null,
+      "ef_ensemble": 66.91,
+      "error_panecho": 9.63,
+      "error_echonet": null,
+      "error_ensemble": 9.63,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X1129FFF0D45D7EFF.avi",
+      "ef_gt": 59.91860623,
+      "ef_panecho": 62.08,
+      "ef_echonet": null,
+      "ef_ensemble": 62.08,
+      "error_panecho": 2.16,
+      "error_echonet": null,
+      "error_ensemble": 2.16,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X112D0A3D2ACB8800.avi",
+      "ef_gt": 61.02682443,
+      "ef_panecho": 64.97,
+      "ef_echonet": null,
+      "ef_ensemble": 64.97,
+      "error_panecho": 3.94,
+      "error_echonet": null,
+      "error_ensemble": 3.94,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X112EF236E1F676E4.avi",
+      "ef_gt": 61.73581207,
+      "ef_panecho": 66.67,
+      "ef_echonet": null,
+      "ef_ensemble": 66.67,
+      "error_panecho": 4.94,
+      "error_echonet": null,
+      "error_ensemble": 4.94,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X11303E45952732BD.avi",
+      "ef_gt": 53.54182187,
+      "ef_panecho": 61.45,
+      "ef_echonet": null,
+      "ef_ensemble": 61.45,
+      "error_panecho": 7.9,
+      "error_echonet": null,
+      "error_ensemble": 7.9,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X1131FB2A374D34F5.avi",
+      "ef_gt": 55.05341336,
+      "ef_panecho": 60.99,
+      "ef_echonet": null,
+      "ef_ensemble": 60.99,
+      "error_panecho": 5.93,
+      "error_echonet": null,
+      "error_ensemble": 5.93,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X114B58E6B34E55F1.avi",
+      "ef_gt": 45.08211837,
+      "ef_panecho": 65.89,
+      "ef_echonet": null,
+      "ef_ensemble": 65.89,
+      "error_panecho": 20.8,
+      "error_echonet": null,
+      "error_ensemble": 20.8,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X1167650B8BEFF863.avi",
+      "ef_gt": 68.19174723,
+      "ef_panecho": 67.8,
+      "ef_echonet": null,
+      "ef_ensemble": 67.8,
+      "error_panecho": 0.39,
+      "error_echonet": null,
+      "error_ensemble": 0.39,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X11DD5C8CC2A4D225.avi",
+      "ef_gt": 67.39962834,
+      "ef_panecho": 66.22,
+      "ef_echonet": null,
+      "ef_ensemble": 66.22,
+      "error_panecho": 1.18,
+      "error_echonet": null,
+      "error_ensemble": 1.18,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X126C02C8B984672B.avi",
+      "ef_gt": 58.95600364,
+      "ef_panecho": 62.35,
+      "ef_echonet": null,
+      "ef_ensemble": 62.35,
+      "error_panecho": 3.39,
+      "error_echonet": null,
+      "error_ensemble": 3.39,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X126D2362E5A0A3E2.avi",
+      "ef_gt": 59.61190092,
+      "ef_panecho": 63.13,
+      "ef_echonet": null,
+      "ef_ensemble": 63.13,
+      "error_panecho": 3.52,
+      "error_echonet": null,
+      "error_ensemble": 3.52,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X127A2C51D192532D.avi",
+      "ef_gt": 53.11440115,
+      "ef_panecho": 64.28,
+      "ef_echonet": null,
+      "ef_ensemble": 64.28,
+      "error_panecho": 11.17,
+      "error_echonet": null,
+      "error_ensemble": 11.17,
+      "agreement_gap": null
+    },
+    {
+      "filename": "0X129133A90A61A59D.avi",
+      "ef_gt": 19.06633165,
+      "ef_panecho": 50.35,
+      "ef_echonet": null,
+      "ef_ensemble": 50.35,
+      "error_panecho": 31.29,
+      "error_echonet": null,
+      "error_ensemble": 31.29,
+      "agreement_gap": null
+    }
+  ]
+}
