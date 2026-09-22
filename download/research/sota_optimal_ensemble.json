@@ -1,0 +1,77 @@
+{
+  "n_test": 1277,
+  "n_train": 500,
+  "method": "Per-EF-range optimal weighted ensemble (LoRA-PanEcho + EchoNet-Dynamic)",
+  "range_weights": {
+    "Severely reduced": {
+      "w_panecho": 0.0,
+      "w_echonet": 1.0,
+      "mae": 6.7,
+      "n": 83
+    },
+    "Moderately reduced": {
+      "w_panecho": 0.0,
+      "w_echonet": 1.0,
+      "mae": 6.86,
+      "n": 77
+    },
+    "Mildly reduced": {
+      "w_panecho": 0.3,
+      "w_echonet": 0.7,
+      "mae": 4.96,
+      "n": 167
+    },
+    "Normal": {
+      "w_panecho": 0.75,
+      "w_echonet": 0.25,
+      "mae": 3.86,
+      "n": 912
+    },
+    "Hyperdynamic": {
+      "w_panecho": 0.0,
+      "w_echonet": 1.0,
+      "mae": 12.36,
+      "n": 38
+    }
+  },
+  "test_mae_raw_panecho": 8.41,
+  "test_mae_lora_panecho": 6.26,
+  "test_mae_echonet": 5.27,
+  "test_mae_ensemble_5050": 5.2,
+  "test_mae_ensemble_optimal": 4.62,
+  "pearson_r": 0.881,
+  "improvement_vs_raw": 3.79,
+  "improvement_pct": 45.0,
+  "beats_commercial_target": true,
+  "beats_published_sota": false,
+  "error_distribution": {
+    "le_1": {
+      "count": 191,
+      "pct": 15.0
+    },
+    "le_2": {
+      "count": 376,
+      "pct": 29.4
+    },
+    "le_3": {
+      "count": 528,
+      "pct": 41.3
+    },
+    "le_5": {
+      "count": 807,
+      "pct": 63.2
+    },
+    "le_10": {
+      "count": 1174,
+      "pct": 91.9
+    },
+    "le_15": {
+      "count": 1248,
+      "pct": 97.7
+    },
+    "le_20": {
+      "count": 1268,
+      "pct": 99.3
+    }
+  }
+}
